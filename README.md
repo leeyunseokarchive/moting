@@ -3,38 +3,39 @@
 <img src="public/logo.png" alt="Moting Logo" width="100" height="100" />
 
 # Moting (모팅)
+
 ### AI 다대일 실시간 모의면접 플랫폼
 **Real-Time AI Multi-Interviewer Mock Interview Platform**
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.4-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Google Gemini](https://img.shields.io/badge/Google_Gemini-3.8_Flash-8E75B2?style=for-the-badge&logo=googlebard&logoColor=white)](https://ai.google.dev/)
-[![Deepgram](https://img.shields.io/badge/Deepgram-Nova--3-13EF93?style=for-the-badge&logo=deepgram&logoColor=black)](https://deepgram.com/)
-[![Simli](https://img.shields.io/badge/Simli-Trinity--2_WebRTC-FF4081?style=for-the-badge)](https://simli.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-16.4-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.3-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Google Gemini](https://img.shields.io/badge/Google_Gemini-3.8_Flash-8E75B2?style=flat-square&logo=googlebard&logoColor=white)](https://ai.google.dev/)
+[![Deepgram](https://img.shields.io/badge/Deepgram-Nova--3-13EF93?style=flat-square&logo=deepgram&logoColor=black)](https://deepgram.com/)
+[![Simli](https://img.shields.io/badge/Simli-Trinity--2_WebRTC-FF4081?style=flat-square)](https://simli.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
 <br/>
 
-**실제 면접 후기 데이터셋(186건)**을 바탕으로 지원 기업·직무의 면접 환경을 재현하고,  
-**WebRTC 립싱크 아바타 3인 패널**과 **실시간 꼬리질문**으로 실전 압박을 체감한 뒤,  
-**단어 단위 동기화 오디오 첨삭 리포트**로 답변을 복기하는 오픈소스 모의면접 솔루션입니다.
+실제 면접 후기 데이터셋(186건)을 바탕으로 지원 기업·직무의 면접 환경을 재현하고,  
+WebRTC 립싱크 아바타 3인 패널과 실시간 꼬리질문으로 실전 압박을 체감한 뒤,  
+단어 단위 동기화 오디오 첨삭 리포트로 답변을 복기하는 오픈소스 모의면접 솔루션입니다.
 
-[✨ 상세 기능 및 화면 가이드 (docs/FEATURES.md)](docs/FEATURES.md) •
-[🚀 빠른 시작](#-빠른-시작-quick-start) •
-[🏗️ 시스템 아키텍처](#️-시스템-아키텍처) •
-[📊 데이터셋 안내](#-면접-후기-데이터셋)
+[상세 기능 및 화면 가이드 (docs/FEATURES.md)](docs/FEATURES.md) •
+[빠른 시작](#빠른-시작-quick-start) •
+[시스템 아키텍처](#시스템-아키텍처) •
+[데이터셋 안내](#면접-후기-데이터셋)
 
 </div>
 
 ---
 
-## 📸 미리보기 (Preview)
+## 미리보기 (Preview)
 
 <div align="center">
   <img src="docs/images/3-2_면접관발화.png" alt="Moting 실시간 화상 면접실" width="90%" />
-  <p><em>▲ 실시간 WebRTC 립싱크 아바타 3인 패널, 실시간 VAD 발화 감지 및 질문 자막 스트리밍</em></p>
+  <p><em>실시간 WebRTC 립싱크 아바타 3인 패널, 실시간 VAD 발화 감지 및 질문 자막 스트리밍</em></p>
 </div>
 
 <div align="center">
@@ -48,37 +49,37 @@
 
 ---
 
-## 💡 왜 모팅(Moting)인가요?
+## 개요 및 비교
 
-기존 AI 모의면접 솔루션들의 고질적인 한계를 기술적으로 해결했습니다.
+기존 AI 모의면접 솔루션의 구조적 한계를 실제 면접 데이터와 웹 표준 실시간 미디어 기술로 개선했습니다.
 
-| 구분 | 기존 AI 모의면접 솔루션 | 🌟 **Moting (모팅)** |
+| 구분 | 기존 AI 모의면접 솔루션 | Moting (모팅) |
 | :--- | :--- | :--- |
 | **면접 환경** | 모든 기업에 동일한 획일적 기본 질문 반복 | **초기 후기 186건 기반 기업·직무 분위기 및 기출 매칭** |
 | **면접관 구성** | 1인 챗봇 또는 1인 음성 대화 | **최대 3인 다대일 패널 (직함·음성·성향·압박도 분리)** |
 | **인터랙션** | 정적 일러스트 또는 텍스트 자막 UI | **WebRTC 실시간 립싱크 비디오 아바타 + 대기 제스처 연출** |
-| **답변 복기** | 전체 긴 녹음 파일 처음부터 듣기 | **단어 클릭 시 해당 순간 즉시 재생 + 형광펜/빨간펜 첨삭** |
+| **답변 복기** | 전체 긴 녹음 파일 처음부터 재생 | **단어 클릭 시 해당 순간 즉시 재생 + 형광펜/빨간펜 첨삭** |
 | **모순 검증** | 단순 단어 어휘/문법 체크 | **제출 서류(자소서/이력서)와 실제 구두 답변 간 모순 검출** |
 | **개인정보** | 영상 데이터를 클라우드 서버로 전송/저장 | **브라우저 온디바이스 MediaPipe 분석 (영상 외부 미전송)** |
 
 ---
 
-## ⚡ 핵심 기능 (Key Features)
+## 핵심 기능 (Key Features)
 
 ### 1. 전방위 서류 파싱 및 구조화 (`/new`)
-- **공고 URL 자동 크롤링** 및 텍스트 직접 입력 지원
-- **PDF, DOCX, HWP, HWPX** 드래그 앤 드롭 파싱 (별도 프로그램 설치 없이 브라우저에서 직접 처리)
+- 공고 URL 자동 크롤링 및 텍스트 직접 입력 지원
+- PDF, DOCX, HWP, HWPX 드래그 앤 드롭 파싱 (브라우저 및 서버 직접 파싱)
 - 지원 회사, 모집 부문, 필수 요건, 프로젝트 성과 수치 자동 추출
 
 ### 2. 기출 후기 매칭 & 질문 설계도 (`/setup/[id]`)
 - `gemini-embedding-001` 기반 256차원 벡터 유사도 + 키워드 하이브리드 검색으로 유사 면접 후기 매칭
-- 면접관 수(1~3인), 답변 제한시간(60~120초), 압박 강도(1~5단계), 말 끊기 빈도 세밀 제어
+- 면접관 수(1~3인), 답변 제한시간(60~120초), 압박 강도(1~5단계), 말 끊기 빈도 제어
 - `[실제 출제]`, `[자소서 검증]`, `[이력서 기반]`, `[공고 역량]` 근거 배지 부여
-- 실전 감각 유지를 위한 **질문 블라인드 모드** 기본 적용
+- 실전 감각 유지를 위한 질문 블라인드 모드 기본 적용
 
 ### 3. 실시간 다대일 화상 면접실 (`/interview/[id]`)
 - **WebRTC 립싱크 아바타 (Simli Trinity-2)**: 면접관별 외형과 목소리가 동기화된 얼굴 모션 송출
-- **초저지연 음성 인터랙션**: 마이크 입력 ➔ Deepgram Nova-3 전사 ➔ Gemini 3.5 Flash-Lite 꼬리질문 판단까지 평균 1.2초 내 응답
+- **초저지연 음성 인터랙션**: 마이크 입력 -> Deepgram Nova-3 전사 -> Gemini 3.5 Flash-Lite 꼬리질문 판단까지 평균 1.2초 내 응답
 - **인터럽트 (Barge-in) & 침묵 감지**: 지원자가 말하기 시작하면 즉시 면접관 음성 중단, 2초 이상 침묵 구간 자동 기록
 - **온디바이스 비전 분석**: MediaPipe Face Landmarker를 브라우저 내부에서만 구동하여 시선 이탈률과 눈 깜빡임 측정
 
@@ -94,7 +95,7 @@
 
 ---
 
-## 🏗️ 시스템 아키텍처
+## 시스템 아키텍처
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
@@ -142,7 +143,7 @@
 
 ---
 
-## 📊 면접 후기 데이터셋
+## 면접 후기 데이터셋
 
 모팅은 실제 취업 준비생 및 이직자들의 검증된 후기 데이터를 내장하고 있습니다.
 
@@ -153,7 +154,7 @@
 
 ---
 
-## 🚀 빠른 시작 (Quick Start)
+## 빠른 시작 (Quick Start)
 
 ### 1. 사전 요구사항 (Prerequisites)
 - **Node.js**: v20.0.0 이상
@@ -193,7 +194,7 @@ SIMLI_API_KEY=your_simli_api_key_here
 ADMIN_PASSWORD=admin
 ```
 
-> 💡 **참고 (Zero-Config 데모 모드)**:  
+> **참고 (Zero-Config 데모 모드)**:  
 > 외부 API 키가 설정되지 않은 경우에도 Moting은 자체 내장된 **Mock/Demo Fallback 엔진**을 통해 핵심 기능(서류 분석, 사전 구성 질문 면접, 채점 리포트)을 중단 없이 시연해 볼 수 있도록 설계되었습니다.
 
 ### 4. 로컬 개발 서버 실행
@@ -201,11 +202,11 @@ ADMIN_PASSWORD=admin
 npm run dev
 ```
 
-브라우저에서 **[http://localhost:3000](http://localhost:3000)** 으로 접속하면 바로 모팅을 이용하실 수 있습니다!
+브라우저에서 **[http://localhost:3000](http://localhost:3000)** 으로 접속하면 바로 모팅을 이용하실 수 있습니다.
 
 ---
 
-## 💻 주요 스크립트 (CLI Commands)
+## 주요 스크립트 (CLI Commands)
 
 ```bash
 npm run dev      # Next.js 로컬 개발 서버 실행 (포트 3000)
@@ -218,7 +219,7 @@ npx tsc --noEmit # TypeScript 정적 타입 검사
 
 ---
 
-## 📁 디렉토리 구조 (Directory Structure)
+## 디렉토리 구조 (Directory Structure)
 
 ```text
 moting/
@@ -267,15 +268,15 @@ moting/
 
 ---
 
-## 📖 추가 문서 (Documentation)
+## 추가 문서 (Documentation)
 
 - [**기능 및 화면 상세 가이드 (docs/FEATURES.md)**](docs/FEATURES.md): 최종 보고서 세부내용 기반 13개 고해상도 캡처 및 화면별 상세 인터랙션 설명서
 
 ---
 
-## 🤝 기여하기 (Contributing)
+## 기여하기 (Contributing)
 
-기여는 언제나 환영합니다! 버그 제보, 기능 제안, PR(Pull Request) 모두 열려 있습니다.
+기여는 언제나 환영합니다. 버그 제보, 기능 제안, PR(Pull Request) 모두 열려 있습니다.
 
 1. 저장소를 Fork 합니다.
 2. 기능 브랜치를 생성합니다 (`git checkout -b feat/amazing-feature`).
@@ -285,6 +286,6 @@ moting/
 
 ---
 
-## 📄 라이선스 (License)
+## 라이선스 (License)
 
 이 프로젝트는 [MIT License](LICENSE)에 따라 자유롭게 사용, 수정, 배포할 수 있습니다.
