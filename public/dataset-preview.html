@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Moting 면접 후기 빅데이터셋 구조</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Pretendard, -apple-system, sans-serif; }
+    body { background: #f8fafc; padding: 40px; color: #0f172a; width: 1440px; min-height: 900px; }
+    
+    .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 24px; }
+    .title-group h1 { font-size: 26px; font-weight: 800; color: #0f172a; }
+    .title-group p { font-size: 14px; color: #64748b; margin-top: 5px; }
+    
+    .stats-bar { display: flex; gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 20px; flex: 1; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+    .stat-label { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; }
+    .stat-val { font-size: 22px; font-weight: 800; color: #0284c7; margin-top: 4px; }
+    .stat-sub { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+
+    .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+    
+    .card-list { display: flex; flex-direction: column; gap: 14px; }
+    .review-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .company-badge { display: flex; align-items: center; gap: 8px; }
+    .c-name { font-size: 17px; font-weight: 700; color: #0f172a; }
+    .j-name { font-size: 13px; color: #475569; background: #f1f5f9; padding: 3px 8px; border-radius: 6px; font-weight: 500; }
+    .pressure-tag { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+    .p-low { background: #dcfce7; color: #15803d; }
+    .p-mid { background: #fef9c3; color: #a16207; }
+    .p-high { background: #fee2e2; color: #b91c1c; }
+
+    .format-info { font-size: 13px; color: #334155; margin-bottom: 8px; font-weight: 500; }
+    .atmosphere { font-size: 13px; color: #64748b; margin-bottom: 12px; line-height: 1.4; background: #f8fafc; padding: 8px 12px; border-radius: 8px; border-left: 3px solid #cbd5e1; }
+    
+    .q-list { display: flex; flex-direction: column; gap: 5px; }
+    .q-item { font-size: 12.5px; color: #1e293b; display: flex; gap: 6px; align-items: baseline; }
+    .q-icon { font-size: 11px; font-weight: 800; color: #0284c7; background: #e0f2fe; padding: 1px 5px; border-radius: 4px; shrink-0: 0; }
+
+    .json-panel { background: #0f172a; border-radius: 14px; padding: 20px; color: #f8fafc; display: flex; flex-direction: column; }
+    .json-header { font-size: 13px; font-weight: 700; color: #94a3b8; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 8px; }
+    .json-code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; line-height: 1.6; color: #e2e8f0; overflow-x: auto; white-space: pre-wrap; }
+    .k { color: #38bdf8; }
+    .s { color: #fde047; }
+    .n { color: #f472b6; }
+    .b { color: #4ade80; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title-group">
+      <h1>[그림 6] 모팅(Moting) 기축적 면접 후기 빅데이터셋 구조</h1>
+      <p>실전 합·불합격 후기 데이터 기반의 기업별 면접 형식, 분위기, 압박도 및 기출 질문 정형화 데이터베이스</p>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-label">수집된 실제 후기 총계</div>
+      <div class="stat-val">186건</div>
+      <div class="stat-sub">국내 42개 주요 대기업·플랫폼</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">구조화된 기출 질문 풀</div>
+      <div class="stat-val">740+개</div>
+      <div class="stat-sub">직무·CS·인성·꼬리질문 태깅</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">압박도 & 분위기 프로필</div>
+      <div class="stat-val">100%</div>
+      <div class="stat-sub">1~5단계 정량 척도 매핑 완료</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">임베딩 매칭 지원</div>
+      <div class="stat-val">Text-Embedding</div>
+      <div class="stat-sub">유사 기업·직무 자동 폴백 매칭</div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div class="card-list">
+      <!-- Card 1 -->
+      <div class="review-card">
+        <div class="card-top">
+          <div class="company-badge">
+            <span class="c-name">네이버</span>
+            <span class="j-name">신입 백엔드 개발자 (검색·추천)</span>
+          </div>
+          <span class="pressure-tag p-mid">압박 강도 3단계 (심층 검증)</span>
+        </div>
+        <div class="format-info">전형 형식: 3:1 다대일 화상 면접 (약 40분 소요, 실무진 3인 배석)</div>
+        <div class="atmosphere">분위기: 지원자의 답변을 경청하나, 기술적 의사결정의 근거와 트래픽 병목 지점을 집요하게 파고드는 기술 검증 분위기.</div>
+        <div class="q-list">
+          <div class="q-item"><span class="q-icon">Q1</span> Redis Lua 스크립트를 사용해 원자성을 보장한 구체적인 동작 방식은?</div>
+          <div class="q-item"><span class="q-icon">Q2</span> 트래픽이 10배 증가할 때 데이터베이스 커넥션 풀의 임계치는 어떻게 산정했나요?</div>
+          <div class="q-item"><span class="q-icon">Q3</span> SSE 대신 캐시 폴링을 선택했을 때의 트레이드오프와 k6 부하 테스트 수치는?</div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="review-card">
+        <div class="card-top">
+          <div class="company-badge">
+            <span class="c-name">카카오</span>
+            <span class="j-name">서버 개발자 (공채)</span>
+          </div>
+          <span class="pressure-tag p-low">압박 강도 2단계 (호의적·힌트 제공)</span>
+        </div>
+        <div class="format-info">전형 형식: 2:1 다대일 면접 (약 50분 소요, 기술 팀장 + 시니어 개발자)</div>
+        <div class="atmosphere">분위기: 편안한 분위기를 유도하며, 모르는 개념이 나오더라도 힌트를 주며 논리적 사고 과정을 관찰함.</div>
+        <div class="q-list">
+          <div class="q-item"><span class="q-icon">Q1</span> 대규모 트래픽 환경에서 Kafka 파티션 분배 전략과 메시지 유실 방지 대책은?</div>
+          <div class="q-item"><span class="q-icon">Q2</span> 본인이 작성한 코드 중 가장 아쉬웠던 레거시 리팩토링 경험이 있나요?</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JSON Schema Panel -->
+    <div class="json-panel">
+      <div class="json-header">
+        <span>JSONL STRUCTURED SCHEMA</span>
+        <span style="color: #38bdf8;">data/moting/interview_reviews.jsonl</span>
+      </div>
+      <div class="json-code">{
+  <span class="k">"id"</span>: <span class="s">"rev_naver_be_08"</span>,
+  <span class="k">"company"</span>: <span class="s">"네이버"</span>,
+  <span class="k">"job"</span>: <span class="s">"신입 백엔드 개발자"</span>,
+  <span class="k">"companyType"</span>: <span class="s">"대기업"</span>,
+  <span class="k">"stage"</span>: <span class="s">"1차 기술 실무면접"</span>,
+  <span class="k">"format"</span>: {
+    <span class="k">"interviewers"</span>: <span class="n">3</span>,
+    <span class="k">"duration_min"</span>: <span class="n">40</span>,
+    <span class="k">"mode"</span>: <span class="s">"다대일 화상"</span>
+  },
+  <span class="k">"pressure"</span>: <span class="n">3</span>,
+  <span class="k">"atmosphere"</span>: <span class="s">"기술적 집요함 검증"</span>,
+  <span class="k">"questions"</span>: [
+    <span class="s">"Redis Lua 원자성 보장 방식"</span>,
+    <span class="s">"DB 커넥션 풀 고갈 원인"</span>,
+    <span class="s">"캐시 폴링 vs SSE 트레이드오프"</span>
+  ],
+  <span class="k">"embedding"</span>: [<span class="n">0.024</span>, <span class="n">-0.115</span>, <span class="n">...</span>]
+}</div>
+    </div>
+  </div>
+</body>
+</html>
+

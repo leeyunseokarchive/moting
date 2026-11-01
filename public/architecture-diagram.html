@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Moting 시스템 구성 및 데이터 처리 흐름도</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { background: #ffffff; padding: 24px 32px; color: #0f172a; width: 1440px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .header { width: 100%; margin-bottom: 16px; text-align: center; }
+    .title { font-size: 26px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; }
+    .subtitle { font-size: 14px; color: #64748b; margin-top: 4px; font-weight: 500; }
+    .mermaid-box { width: 100%; background: #ffffff; border: 2px solid #e2e8f0; border-radius: 18px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; justify-content: center; }
+    .mermaid { width: 100%; display: flex; justify-content: center; }
+    svg { max-width: 100% !important; height: auto !important; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">[그림 7] 모팅(Moting) 시스템 구성 및 데이터 처리 흐름도</div>
+    <div class="subtitle">브라우저 클라이언트 · 서버 처리 파이프라인 · 외부 멀티모달 AI 간 상호 연동 아키텍처</div>
+  </div>
+
+  <div class="mermaid-box">
+    <pre class="mermaid">
+    flowchart LR
+      subgraph CLIENT["1. 브라우저 클라이언트 (Next.js 15 / React 19)"]
+        direction TB
+        C1["<b>Web Audio API</b><br/>마이크 스트림 & dB 측정"]
+        C2["<b>MediaPipe WASM</b><br/>468개 안면 랜드마크 분석"]
+        C3["<b>WebRTC Player</b><br/>1~3인 립싱크 아바타 렌더링"]
+        C4["<b>Interactive Sync Player</b><br/>단어 타임스탬프 & 빨간펜"]
+      end
+
+      subgraph SERVER["2. 서버 처리 파이프라인 (Node.js API)"]
+        direction TB
+        S1["<b>Document Parser</b><br/>HWP/PDF 바이너리 복호화"]
+        S2["<b>Matching Engine</b><br/>186건 후기 DB 벡터 매칭"]
+        S3["<b>Director Engine</b><br/>발화 종료 감지 & 제스처 제어"]
+        S4["<b>Evaluation Engine</b><br/>자소서 모순 검증 & 5점 채점"]
+      end
+
+      subgraph CLOUD["3. 외부 멀티모달 AI 인프라"]
+        direction TB
+        A1["<b>Google Gemini</b><br/>꼬리질문 & 페르소나 대화"]
+        A2["<b>Deepgram Nova-2</b><br/>초저지연 스트리밍 STT"]
+        A3["<b>Simli AI Engine</b><br/>실시간 립싱크 WebRTC"]
+      end
+
+      %% 데이터 흐름
+      C1 ==>|"1) 오디오 스트림"| A2
+      A2 ==>|"2) 실시간 전사 & VAD"| S3
+      S3 <==>|"3) 꼬리질문 추론"| A1
+      S3 ==>|"4) TTS & 휴먼 제스처"| A3
+      A3 ==>|"5) WebRTC 영상/음성"| C3
+      C2 -.->|"6) 비언어 지표 (영상 미전송)"| S4
+      S1 --> S2 --> S3 --> S4
+      S4 ==>|"7) 채점표 & 단어 싱크 데이터"| C4
+
+      classDef clientNode fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0369a1,font-size:13px;
+      classDef serverNode fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e,font-size:13px;
+      classDef cloudNode fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#6b21a8,font-size:13px;
+
+      class C1,C2,C3,C4 clientNode;
+      class S1,S2,S3,S4 serverNode;
+      class A1,A2,A3 cloudNode;
+    </pre>
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'neutral',
+      securityLevel: 'loose',
+      flowchart: {
+        nodeSpacing: 35,
+        rankSpacing: 45,
+        curve: 'basis'
+      }
+    });
+  </script>
+</body>
+</html>

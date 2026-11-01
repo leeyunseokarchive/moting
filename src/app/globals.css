@@ -1,0 +1,456 @@
+@import "tailwindcss";
+
+/*
+ * Moting 디자인 토큰 (Apple HIG 기반 화이트 모드)
+ * 강조색은 파랑 하나, 빨강은 보고서의 펜 표시에만 쓴다.
+ */
+:root {
+  --bg: #ffffff;
+  --canvas: #f5f5f7;
+  --ink: #1d1d1f;
+  --ink-2: #6e6e73;
+  --ink-3: #86868b;
+  --hairline: #d2d2d7;
+  --fill: #e8e8ed;
+  --fill-press: #dcdce1;
+  --accent: #0071e3;
+  --accent-press: #0062c4;
+  --accent-soft: #e8f1fc;
+  --pen: #ff3b30;
+  --positive: #248a3d;
+  --warn: #b25000;
+  --danger: #c4271d;
+  --danger-soft: #fbe9e8;
+  --danger-press: #f8dcda;
+  --positive-soft: #e8f6ec;
+  --warn-soft: #fff4e5;
+  --pen-soft: #fff1f0;
+  --paper: #fffef9;
+  --paper-2: #f8f6ee;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 4%), 0 8px 24px rgb(0 0 0 / 6%);
+  --shadow-paper: 0 1px 1px rgb(0 0 0 / 4%), 0 12px 40px rgb(0 0 0 / 8%);
+  --shadow-float: 0 1px 2px rgb(0 0 0 / 6%), 0 16px 48px rgb(0 0 0 / 14%);
+  /* 들어올 때는 빠르게 시작해 부드럽게 멈추고, 나갈 때는 천천히 시작해 빠르게 끝낸다 */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-overshoot: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --dur-stage: 600ms;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", "Pretendard Variable", Pretendard,
+    "Noto Sans KR", system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Apple SD Gothic Neo", "Pretendard Variable",
+    Pretendard, "Noto Sans KR", system-ui, sans-serif;
+  --font-pen: "Nanum Pen Script", "Apple SD Gothic Neo", cursive;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-canvas: var(--canvas);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-hairline: var(--hairline);
+  --color-fill: var(--fill);
+  --color-fill-press: var(--fill-press);
+  --color-accent: var(--accent);
+  --color-accent-press: var(--accent-press);
+  --color-accent-soft: var(--accent-soft);
+  --color-pen: var(--pen);
+  --color-positive: var(--positive);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-press: var(--danger-press);
+  --color-positive-soft: var(--positive-soft);
+  --color-warn-soft: var(--warn-soft);
+  --color-pen-soft: var(--pen-soft);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --default-transition-duration: var(--dur-base);
+  --default-transition-timing-function: var(--ease-out);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-pen: var(--font-pen);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+}
+
+/* 긴 답변이 자막 위쪽부터 흐려지는 정도. 넘칠 때만 페이드가 생기도록 전환한다 */
+@property --caption-fade {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+html {
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.47;
+  letter-spacing: -0.012em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.022em;
+  line-height: 1.12;
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+@layer components {
+  .field {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    background-color: #fff;
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.4;
+    transition:
+      border-color var(--dur-base) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out);
+  }
+  .field::placeholder {
+    color: var(--ink-3);
+  }
+  .field:hover {
+    border-color: color-mix(in srgb, var(--ink) 30%, var(--hairline));
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent);
+  }
+  select.field {
+    appearance: none;
+    padding-right: 36px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='%2386868b' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+  }
+  textarea.field {
+    resize: vertical;
+    line-height: 1.6;
+  }
+  /* iOS는 16px 미만 입력창에 포커스하면 화면을 확대한다 */
+  @media (max-width: 639px) {
+    .field {
+      font-size: 16px;
+    }
+  }
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ───────── 면접관 대기 연출 ───────── */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.008) translateY(-0.5px);
+  }
+}
+@keyframes nod {
+  0%,
+  100% {
+    transform: translateY(0) rotateX(0);
+  }
+  30% {
+    transform: translateY(3px) rotateX(5deg);
+  }
+  60% {
+    transform: translateY(0) rotateX(0);
+  }
+  75% {
+    transform: translateY(2px) rotateX(3deg);
+  }
+}
+@keyframes look-down {
+  0%,
+  100% {
+    transform: translateY(0) rotateX(0);
+  }
+  25%,
+  80% {
+    transform: translateY(5px) rotateX(9deg) scale(1.004);
+  }
+}
+@keyframes glance {
+  0%,
+  100% {
+    transform: rotateY(0) translateX(0);
+  }
+  30%,
+  70% {
+    transform: rotateY(7deg) translateX(-3px);
+  }
+}
+.motion-breathe {
+  animation: breathe 5.5s ease-in-out infinite;
+}
+.motion-nod {
+  animation: nod 1.4s var(--ease-spring) 1;
+}
+.motion-flipPages,
+.motion-takeNotes {
+  animation: look-down 2.6s ease-in-out 1;
+}
+.motion-glance {
+  animation: glance 2.2s ease-in-out 1;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+.rise {
+  animation: rise 480ms var(--ease-out) both;
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+}
+.pop {
+  transform-origin: top right;
+  animation: pop var(--dur-base) var(--ease-out) both;
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+.fade {
+  animation: fade var(--dur-base) var(--ease-out) both;
+}
+
+@keyframes pen-draw {
+  from {
+    stroke-dashoffset: var(--len, 400);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.pen-stroke {
+  stroke-dasharray: var(--len, 400);
+  animation: pen-draw 700ms ease-out both;
+}
+
+/* 평가지가 화면에 들어오는 만큼 펜이 그려진다. 지원하지 않으면 다 그려진 채로 보인다 */
+@supports (animation-timeline: view()) {
+  .pen-stroke-view {
+    stroke-dasharray: 400;
+    animation: pen-draw linear both;
+    animation-timeline: view();
+    /* 페이지 끝 근처라 비율로 잡으면 끝까지 내려도 덜 그려진다. 완전히 보인 뒤 고정 거리 안에 끝낸다 */
+    animation-range: entry 100% entry calc(100% + 140px);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+}
+
+/* ───────── 면접장 창: 말하는 면접관이 앞으로 나온다 ───────── */
+.tile {
+  z-index: 10;
+  transition:
+    transform var(--dur-stage) var(--ease-spring),
+    opacity var(--dur-stage) var(--ease-spring);
+}
+.tile::before {
+  content: "";
+  position: absolute;
+  inset: -16px;
+  z-index: -20;
+  border-radius: calc(var(--radius-lg) + 16px);
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--accent) 30%, transparent),
+    transparent 45%,
+    rgb(0 0 0 / 30%)
+  );
+  filter: blur(24px);
+  opacity: 0;
+  transition: opacity var(--dur-stage) var(--ease-spring);
+}
+.tile-face {
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--dur-stage) var(--ease-spring);
+}
+.tile[data-focus="on"] {
+  z-index: 20;
+  transform: scale(1.035);
+}
+.tile[data-focus="on"]::before {
+  opacity: 1;
+}
+.tile[data-focus="on"] .tile-face {
+  box-shadow: 0 2px 4px rgb(0 0 0 / 8%), 0 28px 60px -16px rgb(0 0 0 / 34%);
+}
+.tile[data-focus="off"] {
+  transform: scale(0.965);
+  opacity: 0.9;
+}
+
+/* ───────── 면접 자막: 가사처럼 최근 줄만 또렷하다 ───────── */
+.caption-stream {
+  --caption-fade: 1;
+  height: 148px;
+  overflow: hidden;
+  text-align: center;
+  mask-image: linear-gradient(to bottom, rgb(0 0 0 / var(--caption-fade)), #000 62%);
+  transition: --caption-fade var(--dur-slow) var(--ease-out);
+}
+.caption-stream[data-full="true"] {
+  --caption-fade: 0;
+}
+.caption-flow {
+  transition: transform 480ms var(--ease-spring);
+}
+.caption-line {
+  display: block;
+  width: fit-content;
+  margin-inline: auto;
+  background: linear-gradient(100deg, var(--ink) 30%, color-mix(in srgb, var(--ink) 62%, var(--accent)));
+  background-clip: text;
+  color: transparent;
+  mask: linear-gradient(100deg, #000 46%, transparent 54%) 0 0 / 240% 100% no-repeat;
+  animation: caption-line 520ms var(--ease-out) both;
+}
+@keyframes caption-line {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    mask-position: 100% 0;
+  }
+}
+.caption-answer {
+  margin-top: 6px;
+  color: var(--accent);
+}
+.caption-word {
+  display: inline-block;
+  white-space: pre;
+  animation: caption-word 420ms var(--ease-out) both;
+}
+@keyframes caption-word {
+  from {
+    opacity: 0;
+    transform: translateY(0.35em);
+    filter: blur(3px);
+  }
+}
+.caption-leave {
+  animation: caption-leave 260ms var(--ease-in) both;
+}
+@keyframes caption-leave {
+  to {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+/* ───────── 첫 화면: 면접관이 번갈아 앞으로 나온다 ───────── */
+@keyframes hero-focus {
+  0%,
+  26% {
+    transform: scale(1.04);
+  }
+  34%,
+  92% {
+    transform: scale(0.97);
+    opacity: 0.92;
+  }
+  100% {
+    transform: scale(1.04);
+  }
+}
+.hero-tile {
+  animation: hero-focus 12s var(--ease-spring) infinite;
+}
+
+/* ───────── 페이지 전환 ───────── */
+@keyframes page-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+::view-transition-old(.page) {
+  animation: page-out var(--dur-fast) var(--ease-in) both;
+}
+::view-transition-new(.page) {
+  animation: page-in var(--dur-slow) var(--ease-out) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

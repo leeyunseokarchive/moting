@@ -1,0 +1,37 @@
+{
+  "name": "moting",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@google/genai": "^2.32.0",
+    "@mediapipe/tasks-vision": "^1.2.0",
+    "@phosphor-icons/react": "^2.1.10",
+    "@supabase/supabase-js": "^2.118.0",
+    "cfb": "^1.2.2",
+    "next": "16.4.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1",
+    "simli-client": "^3.2.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.3",
+    "puppeteer": "^25.16.0",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^5.0.5"
+  }
+}

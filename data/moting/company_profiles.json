@@ -1,0 +1,554 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-10-30T00:00:00+09:00",
+  "job": "개발(백엔드/SW)",
+  "note": "회사 공식 채용 전형 정보를 사람이 읽고 짧은 사실 문장으로 다시 쓴 것. 원문 복제 아님. facts의 source_id는 crawler/sources.yaml 항목이며 모두 allowed_use에 serve 포함. stages·evaluation_points는 facts에서만 도출. 공식 출처에 없는 항목은 null 또는 gaps.",
+  "companies": [
+    {
+      "company": "네이버",
+      "category": "it",
+      "companyType": "대기업",
+      "industry": "인터넷·플랫폼",
+      "job": "개발",
+      "stages": [],
+      "interviewerCount": null,
+      "evaluation_points": [],
+      "facts": [],
+      "gaps": [
+        "전형 단계",
+        "면접 형식(인원·시간·라이브코딩·PT·온라인/대면)",
+        "평가 포인트·인재상",
+        "면접관 수",
+        "면접 분위기·압박 강도(공식 출처에 원래 없음)",
+        "공식 채용 사이트(목록·FAQ·Tech 직군 소개)에 전형 절차·면접 형식 안내 자체가 없음. FAQ는 재지원 권장 시기만 다룸",
+        "공고 상세는 비공개 AJAX로만 로드되어 읽지 않음(역공학 금지)"
+      ],
+      "source_status": "needs_review: recruit.navercorp.com 약관 링크 없음('NAVER Career 약관 및 정책' 문구만 있음)",
+      "company_type_note": null
+    },
+    {
+      "company": "카카오",
+      "category": "it",
+      "companyType": "대기업",
+      "industry": "인터넷·플랫폼",
+      "job": "개발",
+      "stages": [],
+      "interviewerCount": null,
+      "evaluation_points": [],
+      "facts": [],
+      "gaps": [
+        "전형 단계",
+        "면접 형식(인원·시간·라이브코딩·PT·온라인/대면)",
+        "평가 포인트·인재상",
+        "면접관 수",
+        "면접 분위기·압박 강도(공식 출처에 원래 없음)",
+        "공식 보도자료(kakaocorp.com, 2022-09)에 공채 전형 순서가 있으나 약관상 상업적 이용 금지 → 미사용. 사용자 결정 필요(docs/sources/demo_companies.md)"
+      ],
+      "source_status": "blocked: careers.kakao.com robots.txt HTTP 401, 내용은 내부 API로만 로드. kakaocorp.com 보도자료는 카카오 통합서비스약관 제12조①2(얻은 정보의 사전 승낙 없는 복제·유통·상업적 이용 금지) 적용",
+      "company_type_note": null
+    },
+    {
+      "company": "토스(비바리퍼블리카)",
+      "category": "it",
+      "companyType": "스타트업",
+      "industry": "핀테크",
+      "job": "개발",
+      "stages": [],
+      "interviewerCount": null,
+      "evaluation_points": [],
+      "facts": [],
+      "gaps": [
+        "전형 단계",
+        "면접 형식(인원·시간·라이브코딩·PT·온라인/대면)",
+        "평가 포인트·인재상",
+        "면접관 수",
+        "면접 분위기·압박 강도(공식 출처에 원래 없음)",
+        "토스피드 서버 챕터 FAQ(2022-02)에 전형 순서·코딩테스트 미실시·인터뷰 주제가 있으나 약관 미확인 → 미사용. 사용자 결정 필요",
+        "toss.im/career/faq 답변은 JS 렌더링이라 읽지 못함"
+      ],
+      "source_status": "needs_review: toss.im/career·토스피드에 이용약관·라이선스 표기 없음(약관 원문 미확인)",
+      "company_type_note": "앱 enum 기준 판단. 법적 분류(기업집단 지정 여부)는 확인하지 않음"
+    },
+    {
+      "company": "삼성전자",
+      "category": "large",
+      "companyType": "대기업",
+      "industry": "전자·반도체",
+      "job": "개발",
+      "stages": [
+        {
+          "name": "지원서 접수",
+          "format": "온라인(삼성 채용 홈페이지)",
+          "notes": "인적사항, 학업 이수내용, 경험/자격, 에세이 제출"
+        },
+        {
+          "name": "직무적합성 평가",
+          "format": "서류 평가",
+          "notes": "지원서 정보로 직군별 직무수행역량 평가. 합격자만 다음 단계 응시"
+        },
+        {
+          "name": "직무적성검사(S/W역량테스트)",
+          "format": "실기",
+          "notes": "소프트웨어 지원자는 GSAT 대신 S/W역량테스트로 프로그래밍 개발 능력(코딩+알고리즘) 평가"
+        },
+        {
+          "name": "종합면접: 직무역량면접",
+          "format": "문제풀이 후 프레젠테이션 및 질의응답",
+          "notes": "전공별 문제풀이. 평가: 전공 역량, 직무 동기"
+        },
+        {
+          "name": "종합면접: 창의성면접",
+          "format": "문제풀이 후 프레젠테이션 및 질의응답",
+          "notes": "평가: 독창적인 아이디어와 논리 전개 과정"
+        },
+        {
+          "name": "종합면접: 임원면접",
+          "format": "면접자 1명 대 면접위원 다수, 개인별 질의응답",
+          "notes": "평가: 개인 품성, 조직 적합성 등"
+        },
+        {
+          "name": "채용 건강검진",
+          "format": null,
+          "notes": null
+        }
+      ],
+      "interviewerCount": null,
+      "evaluation_points": [
+        "전공 역량",
+        "직무 동기",
+        "독창적인 아이디어와 논리 전개 과정",
+        "개인 품성",
+        "조직 적합성"
+      ],
+      "facts": [
+        {
+          "text": "3급 신입 공채 전형은 지원서 접수, 직무적합성 평가, 직무적성검사, 종합면접, 채용 건강검진 순서다.",
+          "source_url": "https://www.samsung.com/sec/about-us/careers/hiring-process-information/kr/",
+          "checked_at": "2026-10-30",
+          "source_id": "corp-samsung-hiring-process"
+        },
+        {
+          "text": "소프트웨어 지원자는 직무적성검사로 GSAT 대신 S/W역량테스트를 치르며, 코딩과 알고리즘으로 프로그래밍 개발 능력을 평가한다.",
+          "source_url": "https://www.samsung.com/sec/about-us/careers/hiring-process-information/kr/",
+          "checked_at": "2026-10-30",
+          "source_id": "corp-samsung-hiring-process"
+        },
+        {
+          "text": "종합면접은 임원면접, 직무역량면접, 창의성면접으로 구성된다.",
+          "source_url": "https://www.samsung.com/sec/about-us/careers/hiring-process-information/kr/",
+          "checked_at": "2026-10-30",
+          "source_id": "corp-samsung-hiring-process"
+        },
+        {
+          "text": "직무역량면접은 전공별 문제풀이 후 프레젠테이션과 질의응답으로 진행되고 전공 역량과 직무 동기를 평가한다.",
+          "source_url": "https://www.samsung.com/sec/about-us/careers/hiring-process-information/kr/",
+          "checked_at": "2026-10-30",
+          "source_id": "corp-samsung-hiring-process"
+        },
+        {
+          "text": "창의성면접은 문제풀이 후 프레젠테이션과 질의응답으로 진행되고 독창적인 아이디어와 논리 전개 과정을 평가한다.",
+          "source_url": "https://www.samsung.com/sec/about-us/careers/hiring-process-information/kr/",
+          "checked_at": "2026-10-30",
+          "source_id": "corp-samsung-hiring-process"
+        },
+        {
+          "text": "임원면접은 면접자 1명과 다수의 면접위원이 개인별 질의응답으로 진행하며 개인 품성과 조직 적합성 등을 평가한다.",
+          "source_url": "https://www.samsung.com/sec/about-us/careers/hiring-process-information/kr/",
+          "checked_at": "2026-10-30",
+          "source_id": "corp-samsung-hiring-process"
+        },
+        {
+          "text": "직무적합성 평가 합격자만 직무적성검사를 볼 수 있다.",
+          "source_url": "https://www.samsung.com/sec/about-us/careers/hiring-process-information/kr/",
+          "checked_at": "2026-10-30",
+          "source_id": "corp-samsung-hiring-process"
+        }
+      ],
+      "gaps": [
+        "면접관 수(임원면접은 '다수'로만 표기)",
+        "면접 시간",
+        "S/W역량테스트 문항 수·시간·언어(samsungcareers.com에 있으나 약관이 JS 렌더링이라 미확인 → 미사용)",
+        "온라인/대면 여부",
+        "삼성전자 고유 인재상(이 페이지에 없음)",
+        "면접 분위기·압박 강도(공식 출처에 원래 없음)",
+        "경력 채용 전형(이 페이지는 3급 신입 공채 기준)"
+      ],
+      "source_status": "allowed(사실 재서술만): samsung.com 채용 프로세스 안내. 푸터 '무단 전재, 복사, 배포 금지' 저작권 고지만 있고 자동수집·정보이용 제한 조항 없음",
+      "company_type_note": null
+    },
+    {
+      "company": "LG전자",
+      "category": "large",
+      "companyType": "대기업",
+      "industry": "가전·전자",
+      "job": "개발",
+      "stages": [],
+      "interviewerCount": null,
+      "evaluation_points": [],
+      "facts": [],
+      "gaps": [
+        "전형 단계",
+        "면접 형식(인원·시간·라이브코딩·PT·온라인/대면)",
+        "평가 포인트·인재상",
+        "면접관 수",
+        "면접 분위기·압박 강도(공식 출처에 원래 없음)",
+        "공식 채용 사이트가 JS 전용이라 비공개 API 없이 읽을 수 없음(역공학 금지)",
+        "lg.co.kr 보도자료 검색 결과(2016 SW개발자의 날)에는 전형 정보 없음",
+        "SW 직무 코딩테스트 유무: 공식 출처로 확인 못 함"
+      ],
+      "source_status": "needs_review: careers.lg.com은 JS 셸만 반환(robots.txt 요청에도 SPA HTML), 약관 링크 확인 불가, 내용은 내부 API로만 로드",
+      "company_type_note": null
+    },
+    {
+      "company": "SK하이닉스",
+      "category": "large",
+      "companyType": "대기업",
+      "industry": "반도체",
+      "job": "개발",
+      "stages": [],
+      "interviewerCount": null,
+      "evaluation_points": [],
+      "facts": [],
+      "gaps": [
+        "전형 단계",
+        "면접 형식(인원·시간·라이브코딩·PT·온라인/대면)",
+        "평가 포인트·인재상",
+        "면접관 수",
+        "면접 분위기·압박 강도(공식 출처에 원래 없음)",
+        "공식 뉴스룸(2023-09, 2026-07)에 전형·면접 형식 사실이 있으나 상업 이용·가공 금지 → profile 미사용. 사용자 결정 필요",
+        "skcareers.com에는 SK하이닉스 전형 안내 페이지가 없음(메인·FAQ 메뉴 확인)",
+        "recruit.skhynix.com은 DNS 조회 실패(존재하지 않는 호스트로 보임)",
+        "Solution SW 등 SW 직무의 코딩테스트 여부: 공식 출처로 확인 못 함"
+      ],
+      "source_status": "allowed, allowed_use=[eval]: SK하이닉스 뉴스룸 이용안내 '상업적인 목적으로 사용이 불가', '변형이나 임의 가공을 금지' → 상업 전제에서 serve 불가",
+      "company_type_note": null
+    },
+    {
+      "company": "한국전자통신연구원(ETRI)",
+      "category": "public",
+      "companyType": "공기업",
+      "industry": "ICT 연구개발",
+      "job": "개발",
+      "stages": [
+        {
+          "name": "서류전형",
+          "format": "블라인드 서류 심사",
+          "notes": "심사위원 평균+부가점 70점 이상 중 선발예정인원 5배수"
+        },
+        {
+          "name": "전공면접",
+          "format": null,
+          "notes": "70점 이상 중 2배수. 장소: 본원(대전)·판교·광주·대구·울산"
+        },
+        {
+          "name": "종합면접(인성검사 포함)",
+          "format": null,
+          "notes": "인성검사는 온라인으로 실시해 종합면접 참고자료로 활용. 장소: 본원(대전)"
+        }
+      ],
+      "interviewerCount": null,
+      "evaluation_points": [
+        "국가지능화에 기여할 핵심 인재(모집 목적 문구)"
+      ],
+      "facts": [
+        {
+          "text": "2027년 1차 정규직 공개채용의 연구직·기술직 전형은 서류전형, 전공면접, 종합면접(인성검사 포함) 순서다.",
+          "source_url": "https://www.etri.re.kr/kor/bbs/view.etri?b_board_id=ETRI39&b_idx=19798",
+          "checked_at": "2026-10-30",
+          "source_id": "corp-etri-recruit"
+        },
+        {
+          "text": "연구직·기술직 채용은 블라인드 방식이다.",
+          "source_url": "https://www.etri.re.kr/kor/bbs/view.etri?b_board_id=ETRI39&b_idx=19798",
+          "checked_at": "2026-10-30",
+          "source_id": "corp-etri-recruit"
+        },
+        {
+          "text": "인성검사는 온라인으로 실시하며 종합면접의 참고자료로 활용한다.",
+          "source_url": "https://www.etri.re.kr/kor/bbs/view.etri?b_board_id=ETRI39&b_idx=19798",
+          "checked_at": "2026-10-30",
+          "source_id": "corp-etri-recruit"
+        },
+        {
+          "text": "각 전형은 심사위원 점수 중 최고점과 최저점을 하나씩 뺀 평균에 부가점을 더해 70점 이상인 사람 중에서 고른다.",
+          "source_url": "https://www.etri.re.kr/kor/bbs/view.etri?b_board_id=ETRI39&b_idx=19798",
+          "checked_at": "2026-10-30",
+          "source_id": "corp-etri-recruit"
+        },
+        {
+          "text": "서류전형은 선발예정인원의 5배수, 전공면접은 2배수 내에서 상위 득점자를 선정한다.",
+          "source_url": "https://www.etri.re.kr/kor/bbs/view.etri?b_board_id=ETRI39&b_idx=19798",
+          "checked_at": "2026-10-30",
+          "source_id": "corp-etri-recruit"
+        },
+        {
+          "text": "공고는 2026-09-02 게시, 서류전형 2026년 10월 초, 전공면접 10월 말~11월 초, 종합면접 11월 말~12월 초(모두 예정)다.",
+          "source_url": "https://www.etri.re.kr/kor/bbs/view.etri?b_board_id=ETRI39&b_idx=19798",
+          "checked_at": "2026-10-30",
+          "source_id": "corp-etri-recruit"
+        }
+      ],
+      "gaps": [
+        "SW·AI 등 개발 관련 모집분야명(첨부 PDF·직무기술서 zip에만 있음, 열지 않음)",
+        "전공면접 발표(PT) 여부·시간",
+        "면접관 수",
+        "온라인/대면 여부(장소만 명시)",
+        "면접별 세부 평가 항목",
+        "ETRI 인재상(공식 홈페이지 메뉴에 없음)",
+        "면접 분위기·압박 강도(공식 출처에 원래 없음)"
+      ],
+      "source_status": "allowed(사실 재서술만): etri.re.kr robots Allow: /, 저작권정책은 무단 복제·배포 금지와 공공누리 유형별 조건만 규정",
+      "company_type_note": "법적으로는 정부출연연구기관(공공기관). 앱 enum에 공공기관이 없어 공기업으로 둠"
+    },
+    {
+      "company": "한전KDN",
+      "category": "public",
+      "companyType": "공기업",
+      "industry": "전력 ICT",
+      "job": "개발",
+      "stages": [
+        {
+          "name": "1차 서류전형",
+          "format": "정량 평가",
+          "notes": "지원자격 충족 여부, 직무별 영어성적·자격증 점수. 채용인원 15배수"
+        },
+        {
+          "name": "2차 필기전형",
+          "format": "필기",
+          "notes": "인성검사, 직업기초능력평가, 직무수행능력평가. 3배수"
+        },
+        {
+          "name": "3차 역량면접(PT)·실기평가",
+          "format": "PT 면접 + 코딩테스트",
+          "notes": "실기평가(코딩테스트)는 전산 일반·연구 분야에 한함. 1.5배수"
+        },
+        {
+          "name": "3차 종합면접",
+          "format": null,
+          "notes": "직무능력과 조직 적합도 등 검증. 1배수"
+        },
+        {
+          "name": "4차 신체검사",
+          "format": null,
+          "notes": "적격자"
+        }
+      ],
+      "interviewerCount": null,
+      "evaluation_points": [
+        "직무능력",
+        "조직 적합도"
+      ],
+      "facts": [
+        {
+          "text": "2026년 신입사원(4직급) 공채는 서류전형, 필기전형, 역량면접(PT)·실기평가와 종합면접, 신체검사 순서로 진행됐다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=298369",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "필기전형은 인성검사, 직업기초능력평가, 직무수행능력평가로 구성됐다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=298369",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "3차 전형의 실기평가(코딩테스트)는 전산 일반·전산 연구 분야에만 적용됐다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=298369",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "종합면접은 직무능력과 조직 적합도 등을 검증한다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=298369",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "전산 분야 지원 자격은 컴퓨터 등 관련학과 졸업(예정) 또는 채용 분야 자격증 보유다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=298369",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "기술직군 영어 기준은 TOEIC 600점 이상이며 850점 이상은 만점 처리됐다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=298369",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "우대 항목에 TOPCIT 성적 우수자가 포함됐다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=298369",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        }
+      ],
+      "gaps": [
+        "PT 면접 주제·시간",
+        "코딩테스트 문항 수·시간·언어",
+        "면접관 수",
+        "온라인/대면 여부",
+        "인재상(kdn.com이 robots로 막혀 미확인)",
+        "공고문 첨부(HWP/PDF)는 열지 않음",
+        "면접 분위기·압박 강도(공식 출처에 원래 없음)"
+      ],
+      "source_status": "allowed(alio-recruitment-api, 이용허락 제한 없음). kdn.com 웹은 robots 'User-agent: * / Disallow: /' + AI 크롤러 차단이라 blocked",
+      "company_type_note": "한국전력공사 자회사(공공기관)"
+    },
+    {
+      "company": "한국전력공사",
+      "category": "public",
+      "companyType": "공기업",
+      "industry": "전력·에너지",
+      "job": "개발",
+      "stages": [
+        {
+          "name": "1차 서류전형",
+          "format": "정량 평가",
+          "notes": "외국어성적(100점)+자격증 가점(기술 40점). 기술(전기 외) 15배수"
+        },
+        {
+          "name": "2차 필기전형",
+          "format": "필기",
+          "notes": "직무능력검사(100점), 인성·인재상·조직적합도 검사(적부)"
+        },
+        {
+          "name": "3차 면접전형: 직무면접",
+          "format": null,
+          "notes": "50점"
+        },
+        {
+          "name": "3차 면접전형: 경험면접",
+          "format": null,
+          "notes": "50점. 1배수"
+        }
+      ],
+      "interviewerCount": null,
+      "evaluation_points": [
+        "인성·인재상·조직적합도(필기 단계 적부 검사)"
+      ],
+      "facts": [
+        {
+          "text": "2026년도 하반기 4직급 대졸수준 신입사원 공채는 서류전형, 필기전형, 면접전형 순서다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=304551",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "필기전형은 직무능력검사(100점)와 인성·인재상·조직적합도 검사(적부)로 구성된다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=304551",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "면접전형은 직무면접 50점과 경험면접 50점으로 구성된다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=304551",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "서류전형은 외국어성적과 자격증 가점으로 평가하며 기술 분야 자격증 가점은 40점이다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=304551",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "지원 외국어 기준은 TOEIC 기준 700점 이상이고, 기술 분야는 해당 분야 전공자 또는 관련 자격증 보유자가 지원할 수 있다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=304551",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        }
+      ],
+      "gaps": [
+        "ICT(전산) 분야 모집 여부·인원(공고 요약에는 사무/기술만 있음, 첨부 공고문은 열지 않음)",
+        "코딩테스트 유무(요약에 없음)",
+        "면접관 수",
+        "면접 시간·온라인/대면 여부",
+        "인재상 본문(공식 웹 접속 불가)",
+        "면접 분위기·압박 강도(공식 출처에 원래 없음)"
+      ],
+      "source_status": "allowed(alio-recruitment-api). home.kepco.co.kr·recruit.kepco.co.kr은 이 서버에서 접속 실패(타임아웃·연결 오류)라 웹 약관·인재상 미확인",
+      "company_type_note": null
+    }
+  ],
+  "alternates": [
+    {
+      "company": "한국인터넷진흥원(KISA)",
+      "category": "public",
+      "companyType": "공기업",
+      "industry": "정보보호·인터넷",
+      "job": "개발",
+      "stages": [
+        {
+          "name": "서류전형",
+          "format": "정량 10 + 정성 90",
+          "notes": null
+        },
+        {
+          "name": "필기전형",
+          "format": "필기",
+          "notes": "온라인 인성검사, NCS 직업기초능력, 직무수행능력(전공)"
+        },
+        {
+          "name": "1차 면접",
+          "format": "다대다 대면면접",
+          "notes": "직무 관련 과제수행 및 토론·토의"
+        },
+        {
+          "name": "최종 면접",
+          "format": "다대다 대면면접",
+          "notes": "상황 제시, 경험 질의 등"
+        }
+      ],
+      "interviewerCount": null,
+      "evaluation_points": [],
+      "facts": [
+        {
+          "text": "2026년 하반기 일반직 채용은 서류전형, 필기전형, 1차 면접, 최종 면접 순서다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=305199",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "필기전형은 온라인 인성검사, NCS 직업기초능력, 직무수행능력(전공)으로 구성된다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=305199",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "1차 면접은 다대다 대면면접으로 직무 관련 과제수행과 토론·토의를 한다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=305199",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "최종 면접은 다대다 대면면접으로 상황 제시와 경험 질의 등을 한다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=305199",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "서류전형은 정량평가 10, 정성평가 90 비율이다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=305199",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        },
+        {
+          "text": "2026년 3월 일반직 채용도 같은 4단계 구조였다.",
+          "source_url": "https://job.alio.go.kr/recruitview.do?idx=298486",
+          "checked_at": "2026-10-30",
+          "source_id": "alio-recruitment-api"
+        }
+      ],
+      "gaps": [
+        "개발(SW) 모집 분야명(첨부 공고문에만 있음)",
+        "면접관 수('다대다'로만 표기)",
+        "면접 시간",
+        "코딩테스트 유무(요약에 없음)",
+        "인재상",
+        "면접 분위기·압박 강도(공식 출처에 원래 없음)"
+      ],
+      "source_status": "allowed(alio-recruitment-api). kisa.or.kr은 이 서버에서 TLS 인증서 체인 오류로 robots 미확인",
+      "company_type_note": "법적으로는 준정부기관. ETRI 대체 후보로 조사(시연 9곳에는 포함되지 않음)"
+    }
+  ]
+}
