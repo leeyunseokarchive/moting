@@ -22,11 +22,23 @@
 WebRTC 립싱크 아바타 3인 패널과 실시간 꼬리질문으로 실전 압박을 체감한 뒤,  
 단어 단위 동기화 오디오 첨삭 리포트로 답변을 복기하는 오픈소스 모의면접 솔루션입니다.
 
+[시연 영상 (YouTube)](https://youtu.be/zXO4oxpz4e8) •
 [상세 기능 및 화면 가이드 (docs/FEATURES.md)](docs/FEATURES.md) •
 [빠른 시작](#빠른-시작-quick-start) •
 [시스템 아키텍처](#시스템-아키텍처) •
 [데이터셋 안내](#면접-후기-데이터셋)
 
+</div>
+
+---
+
+## 시연 영상 (Demo Video)
+
+<div align="center">
+  <a href="https://youtu.be/zXO4oxpz4e8" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.youtube.com/vi/zXO4oxpz4e8/maxresdefault.jpg" alt="Moting 실시간 모의면접 시연 영상" width="90%" />
+  </a>
+  <p><em>Moting 실시간 모의면접 전체 진행 시연 영상 (클릭 시 YouTube로 이동)</em></p>
 </div>
 
 ---
