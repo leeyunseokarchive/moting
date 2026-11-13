@@ -40,6 +40,8 @@ export type EngineView = {
   /** 이번 질문에 대해 확정된 답변 */
   answer: string;
   interim: string;
+  /** 침묵이 이어지면 답변을 끝으로 볼 시각(performance.now() 기준). 예정이 없으면 null */
+  endAt: number | null;
   notice: string | null;
 };
 
@@ -58,6 +60,28 @@ const END_GRACE_MS = 3800; // 망설임·생각 정리 시간을 충분히 기�
 const UTTERANCE_GRACE_MS = 3200; // STT가 발화 끝을 알린 뒤의 대기
 const NO_ANSWER_MS = 14000; // 질문 후 이만큼 말이 없으면 재촉
 const PREROLL_SEC = 0.8; // 질문 끝나기 직전 성급하게 시작한 첫 음절이 잘리지 않도록 여유분 확보
+const UNFINISHED_EXTRA_MS = 2800; // 말이 문장 중간에서 멈췄을 때 한 번 더 기다리는 시간
+// 면접관 음성이 나기 시작한 뒤 이만큼까지 끝난 말도 이전 답변의 꼬리로 본다.
+// STT 단어 시각·시계 맞춤 오차(0.1~0.3초)를 덮고, 질문이 나온 지 0.5초 안에 그 질문에 답할 수는 없기 때문
+const STALE_TOL_SEC = 0.5;
+
+const FILLERS = new Set(["음", "어", "그", "저", "아", "뭐", "이제", "약간"]);
+const CONNECTIVES = new Set(["그리고", "그래서", "그런데", "근데", "하지만", "그러나", "그러면", "그래도", "그러니까", "왜냐하면", "또", "또는", "및"]);
+// 연결 어미(~고, ~며, ~서, ~는데, ~지만, ~면, ~니까 …)와 조사(은/는/이/가/을/를/에/의/와/과/도/로/만 …)
+const OPEN_ENDING = /(고|며|서|데|지만|면|니까|거나|려고|도록|다가|위해|대해|통해|은|는|이|가|을|를|에|의|와|과|도|로|만|랑|에게|한테|부터|까지|보다|처럼)$/;
+
+/**
+ * 답변이 문장 중간에서 멈춘 것처럼 보이는지. 마지막 어절의 끝 글자만 본다.
+ * 한계: 형태소 분석이 아니라서 "결과", "정도"처럼 조사·어미와 같은 글자로 끝나는 명사는 미완성으로 잘못 보고(대기만 길어진다),
+ * 명사로 뚝 끊긴 문장("제가 맡은 역할")은 잡지 못한다.
+ */
+export function looksUnfinished(text: string): boolean {
+  // punctuate가 문장 중간에도 마침표를 붙일 수 있어 끝 문장부호는 떼고 본다
+  const last = text.replace(/[\s.,!?…~]+$/, "").split(/\s+/).at(-1) ?? "";
+  if (!last) return false;
+  if (FILLERS.has(last) || CONNECTIVES.has(last)) return true;
+  return last.length >= 2 && OPEN_ENDING.test(last);
+}
 
 export class InterviewEngine {
   private d: Deps;
@@ -70,6 +94,7 @@ export class InterviewEngine {
   private answerStartSec: number | null = null;
   private endTimer: ReturnType<typeof setTimeout> | null = null;
   private endDeadline = 0;
+  private endExtended = false; // 이번 침묵에서 마감을 이미 한 번 미뤘는지
   private noAnswerTimer: ReturnType<typeof setTimeout> | null = null;
   private maxTimer: ReturnType<typeof setTimeout> | null = null;
   private clock: ReturnType<typeof setInterval> | null = null;
@@ -83,6 +108,7 @@ export class InterviewEngine {
   private pendingPosts: Promise<unknown>[] = [];
   private turnSeq = 0;
   private speakingStartedAt = 0;
+  private spokeAtSec = 0; // 지금 면접관 음성이 나기 시작한 시각(mic.now() 기준, 초)
 
   constructor(deps: Deps) {
     this.d = deps;
@@ -95,6 +121,7 @@ export class InterviewEngine {
       lastQuestion: "",
       answer: "",
       interim: "",
+      endAt: null,
       notice: null,
     };
   }
@@ -186,6 +213,11 @@ export class InterviewEngine {
     }
   };
 
+  /** 면접관 음성이 나기 전에 한 말(이전 답변의 꼬리)이 뒤늦게 도착한 것인지. 시각이 없으면 판단하지 않는다 */
+  private stale(sec?: number): boolean {
+    return sec !== undefined && sec < this.spokeAtSec + STALE_TOL_SEC;
+  }
+
   private ensureListeningFromEarlySpeech(): boolean {
     if (this.view.phase === "listening") return true;
     if (this.view.phase === "speaking" && performance.now() - this.speakingStartedAt > 800) {
@@ -196,9 +228,10 @@ export class InterviewEngine {
     return false;
   }
 
-  onInterim = (text: string) => {
+  onInterim = (text: string, startSec?: number) => {
     const trimmed = text.trim();
     if (!trimmed) return;
+    if (this.stale(startSec)) return;
     if (!this.ensureListeningFromEarlySpeech()) return;
     if (this.noAnswerTimer) clearTimeout(this.noAnswerTimer);
     if (this.answerStartSec === null) {
@@ -206,13 +239,14 @@ export class InterviewEngine {
       this.armMaxAnswer();
     }
     const changed = trimmed !== this.view.interim.trim();
-    this.emit({ interim: trimmed, answering: true });
     if (changed || !this.endTimer) {
       this.armEnd(END_GRACE_MS + 1200);
     }
+    this.emit({ interim: trimmed, answering: true });
   };
 
   onFinal = (seg: FinalSegment) => {
+    if (this.stale(seg.end)) return;
     if (!this.ensureListeningFromEarlySpeech()) return;
     if (this.noAnswerTimer) clearTimeout(this.noAnswerTimer);
     this.segments.push(seg);
@@ -220,15 +254,18 @@ export class InterviewEngine {
       this.answerStartSec = Math.max(0, seg.start - PREROLL_SEC);
       this.armMaxAnswer();
     }
-    this.emit({ answer: this.answerText, interim: "", answering: true });
     this.armEnd(END_GRACE_MS);
+    this.emit({ answer: this.answerText, interim: "", answering: true });
   };
 
   onUtteranceEnd = () => {
     if (this.view.phase !== "listening") return;
     if (this.segments.length === 0 && !this.view.interim.trim()) return;
     // 마감은 당기기만 한다. speech_final 뒤에 오는 UtteranceEnd와 침묵 중 빈 결과가 대기를 늘리지 않도록
-    if (!this.endTimer || performance.now() + UTTERANCE_GRACE_MS < this.endDeadline) this.armEnd(UTTERANCE_GRACE_MS);
+    if (!this.endTimer || performance.now() + UTTERANCE_GRACE_MS < this.endDeadline) {
+      this.armEnd(UTTERANCE_GRACE_MS);
+      this.emit({});
+    }
   };
 
   /* ───────── 진행 ───────── */
@@ -251,6 +288,12 @@ export class InterviewEngine {
 
   private emit(patch: Partial<EngineView>) {
     this.view = { ...this.view, ...patch };
+    // 마감 예정 시각은 타이머 상태에서 그대로 따온다(듣는 중이 아니면 없다).
+    // 문장이 덜 끝나 한 번 더 기다릴 참이면 그 시간까지 더해, 예고가 끝났다가 다시 시작하지 않게 한다
+    this.view.endAt =
+      this.endTimer && this.view.phase === "listening"
+        ? this.endDeadline + (!this.endExtended && looksUnfinished(`${this.view.answer} ${this.view.interim}`) ? UNFINISHED_EXTRA_MS : 0)
+        : null;
     this.d.onView(this.view);
   }
 
@@ -319,6 +362,7 @@ export class InterviewEngine {
     };
     this.resetAnswerBuffer();
     this.speakingStartedAt = performance.now();
+    this.spokeAtSec = this.d.mic.now(); // 소리가 나지 않고 끝나는 경우를 위한 임시값. 실제 시작은 onStart에서 잡는다
     this.setMotion(null, "still");
     this.emit({ phase: "speaking", speakerId: iv.id, questionKind: kind });
     // 자막은 소리와 함께 시작한다. 소리가 나지 않고 끝난 경우에도 질문은 보여 준다
@@ -329,6 +373,7 @@ export class InterviewEngine {
       text: action.say,
       onStart: () => {
         this.speakingStartedAt = performance.now();
+        this.spokeAtSec = this.d.mic.now();
         entry.at = Math.round(this.d.mic.now() * 1000);
         showCaption();
       },
@@ -381,10 +426,22 @@ export class InterviewEngine {
     if (!alreadySpeaking) this.armNoAnswer();
   }
 
-  private armEnd(ms = END_GRACE_MS) {
+  private armEnd(ms = END_GRACE_MS, extension = false) {
     this.clearEndTimer();
-    this.endDeadline = performance.now() + ms;
-    this.endTimer = setTimeout(() => this.onAnswerDone(), ms);
+    this.endExtended = extension;
+    // 연장은 앞서 알린 마감 시각에 그대로 이어 붙인다(타이머 오차로 예고가 깜빡이지 않게)
+    this.endDeadline = extension ? this.endDeadline + ms : performance.now() + ms;
+    this.endTimer = setTimeout(() => this.onSilence(), Math.max(0, this.endDeadline - performance.now()));
+  }
+
+  /** 침묵 타이머가 끝났을 때. 문장이 끝나지 않은 채 멈췄으면 한 번만 더 기다린다 */
+  private onSilence() {
+    if (this.view.phase === "listening" && !this.endExtended && looksUnfinished(`${this.answerText} ${this.view.interim}`)) {
+      this.armEnd(UNFINISHED_EXTRA_MS, true);
+      this.emit({});
+      return;
+    }
+    void this.onAnswerDone();
   }
 
   private clearEndTimer() {

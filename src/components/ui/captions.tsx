@@ -40,18 +40,38 @@ function Word({ text, delay }: { text: string; delay: number }) {
   );
 }
 
-/** 질문이 바뀌면 질문과 답변을 함께 내보낸 뒤 새 질문을 한 줄씩 쌓는다 */
-export function Captions({ question, answer, speaking }: { question: string; answer: string; speaking: boolean }) {
-  const [shown, setShown] = useState({ question: "", answer: "" });
+export type CaptionAlign = "start" | "center" | "end";
+
+/**
+ * 질문이 바뀌면 질문과 답변을 함께 내보낸 뒤 새 질문을 한 줄씩 쌓는다.
+ * 자막은 질문한 면접관 자리 아래에 놓이고(align), 누가 한 말인지 이름을 함께 보여 준다.
+ */
+export function Captions({
+  question,
+  answer,
+  speaking,
+  speakerName = "",
+  speakerRole = "",
+  align = "center",
+}: {
+  question: string;
+  answer: string;
+  speaking: boolean;
+  speakerName?: string;
+  speakerRole?: string;
+  align?: CaptionAlign;
+}) {
+  const [shown, setShown] = useState({ question: "", answer: "", speakerName: "", speakerRole: "", align: "center" as CaptionAlign });
   const leaving = shown.question !== question;
-  if (!leaving && shown.answer !== answer) setShown({ question, answer });
+  if (!leaving && shown.answer !== answer) setShown({ ...shown, answer });
 
   // 애니메이션 이벤트에 맡기면 CSS가 적용되지 않았을 때 자막이 영영 멈춘다
+  // 이름과 자리는 질문과 함께 바뀐다. 먼저 바꾸면 앞 질문이 새 면접관의 말처럼 보인다
   useEffect(() => {
     if (!leaving) return;
-    const timer = setTimeout(() => setShown({ question, answer: "" }), LEAVE_MS);
+    const timer = setTimeout(() => setShown({ question, answer: "", speakerName, speakerRole, align }), LEAVE_MS);
     return () => clearTimeout(timer);
-  }, [leaving, question]);
+  }, [leaving, question, speakerName, speakerRole, align]);
 
   const words = shown.answer ? shown.answer.split(/\s+/) : [];
   const [seen, setSeen] = useState(0);
@@ -87,7 +107,21 @@ export function Captions({ question, answer, speaking }: { question: string; ans
 
   let chars = 0;
   return (
-    <div ref={stream} className={`caption-stream mx-auto w-full max-w-[680px] ${leaving ? "caption-leave" : ""}`}>
+    <div className={`caption w-full max-w-[680px] ${leaving ? "caption-leave" : ""}`} data-align={shown.align}>
+      <p className="caption-speaker text-[13px]">
+        {shown.speakerName && (
+          <>
+            <span className="voice-bars" data-on={speaking} aria-hidden>
+              <i />
+              <i />
+              <i />
+            </span>
+            <span className="font-semibold text-ink">{shown.speakerName}</span>
+            <span className="text-ink-2">{shown.speakerRole}</span>
+          </>
+        )}
+      </p>
+      <div ref={stream} className="caption-stream">
       <div ref={flow} key={shown.question} className="caption-flow">
         <div
           className={`text-[17px] font-medium leading-normal transition-opacity duration-300 sm:text-[19px] ${
@@ -111,6 +145,7 @@ export function Captions({ question, answer, speaking }: { question: string; ans
             ))}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import "server-only";
 import { promises as fs } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { ReviewSchema, SessionSchema, type Review, type Session } from "../types";
 import { seedReviews } from "../seed/dataset";
@@ -10,7 +11,10 @@ import type { Store } from "./index";
 export class FileStore implements Store {
   private reviewWrites: Promise<void> = Promise.resolve();
 
-  constructor(private root = process.env.MOTING_DATA_DIR ?? path.join(process.cwd(), ".data")) {}
+  constructor(
+    private root = process.env.MOTING_DATA_DIR ??
+      (process.env.VERCEL ? path.join(os.tmpdir(), ".data") : path.join(process.cwd(), ".data"))
+  ) {}
 
   private file(...parts: string[]) {
     return path.join(this.root, ...parts);

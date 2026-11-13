@@ -30,6 +30,9 @@ export function followupsSinceLastQuestion(transcript: TranscriptEntry[]): numbe
   return n;
 }
 
+// ponytail: 어미·낱말 규칙이라 "…할 수 있을까요 고민했습니다" 같은 말은 놓치거나 잘못 잡을 수 있다. 키 없는 대체 진행에서만 쓴다
+const asksQuestion = (text: string) => /[?？]|궁금(?![^.?!]*없)|여쭤|여쭙|(?:까요|나요|가요|니까)[.!\s]*$/.test(text);
+
 const isClosing = (p: QuestionPlanItem) =>
   /마지막으로.*(?:말씀|질문|하고\s*싶은)|궁금한\s*점/.test(p.question) || /마지막\s*할\s*말/.test(p.intent);
 
@@ -95,7 +98,7 @@ export function normalizeAction(
       base.speakerId = next.interviewerId;
       base.kind = "question";
     } else {
-      base.say = "마지막으로 하고 싶은 말씀이 있으시면 해 주세요.";
+      base.say = "마지막으로 하고 싶은 말씀이나 궁금한 점이 있으시면 말씀해 주세요.";
       base.kind = "closing";
     }
   }
@@ -119,7 +122,8 @@ export function directorSystem(profile: EnvironmentProfile): string {
 ${panel}
 
 규칙:
-- say는 면접관이 실제로 소리 내어 말할 문장만 쓴다(존댓말, 1~2문장, 60자 안팎). 지문·괄호·이름표 금지.
+- say는 면접관이 실제로 소리 내어 말할 문장만 쓴다(존댓말, 1~2문장, 60자 안팎. 마지막 인사에서 지원자의 질문에 답할 때만 120자 안팎까지). 지문·괄호·이름표 금지.
+- 지원자의 말은 음성 인식으로 받아쓴 글이다. 전문용어가 소리가 비슷한 엉뚱한 글자나 숫자로 적혀 있을 수 있다(예: "구조" → "9조"). 서류의 전문용어와 문맥에 비추어 지원자가 실제로 말했을 가장 그럴듯한 용어로 읽는다. 받아쓰기 오류를 지원자가 이상한 말을 한 것처럼 되묻거나 지적하지 않는다.
 - 답변이 모호하거나 수치·근거가 없으면 꼬리질문(kind=followup, planId=null). 앞 질문을 한 면접관이 아니어도 된다. "이번 발화자"가 자기 관심 분야에서 이어 묻는다.
 - 꼬리질문이 최대 깊이에 이르렀거나 답변이 충분하면 "다음 계획 질문"으로 넘어간다(kind=question, planId=그 id). 질문 문장은 자연스럽게 다듬어도 된다.
 - speakerId는 "이번 발화자"로 쓴다. 면접관이 바뀔 때는 앞 답변을 짧게 받아서 넘기는 말투도 좋다.
@@ -136,6 +140,8 @@ export function directorUserPrompt(
   plan: QuestionPlanItem[],
   transcript: TranscriptEntry[],
   coverLetterClaims: string[],
+  /** terms: 지원자 서류의 전문용어(glossary). recited: 직전 답변이 자소서를 거의 그대로 되풀이했는지 */
+  opts: { terms?: string[]; recited?: boolean } = {},
 ): string {
   const next = nextPlanned(profile, plan, transcript);
   const speaker = nextSpeaker(profile.interviewers, transcript);
@@ -148,15 +154,22 @@ export function directorUserPrompt(
     opening: `지금은 면접 시작이다. 주 질문자가 ${profile.greetingStyle || "짧게 인사"} 후 1분 자기소개를 요청한다. kind=question, planId=null.`,
     next: `지원자의 직전 답변부터 판단한다. 수치·근거·본인 역할이 빠져 있고 꼬리질문이 ${profile.followupDepth}회 미만이면 계획 질문으로 넘어가지 말고 그 답변을 짚는 꼬리질문을 한다(kind=followup, planId=null). 답변이 충분하거나 꼬리질문을 다 썼을 때만 다음 계획 질문으로 넘어간다.`,
     timeout: `지원자의 답변이 ${req.lastAnswerSec ?? profile.maxAnswerSec}초를 넘어 길어지고 있다. 질문한 면접관이 정중하지만 단호하게 말을 끊고 핵심만 짧게 다시 묻는다. kind=interrupt.`,
-    closing: "면접 시간이 거의 끝났다. 주 질문자가 마지막으로 하고 싶은 말을 묻는다. kind=closing, planId=null.",
-    farewell: "지원자의 마지막 말을 들었다. 주 질문자가 짧게 감사 인사와 함께 면접 종료를 알린다(\"수고하셨습니다\" 포함). kind=closing, end=true, backchannel=false.",
+    closing: "면접 시간이 거의 끝났다. 주 질문자가 마지막으로 하고 싶은 말씀이나 궁금한 점이 있는지 묻는다. kind=closing, planId=null.",
+    farewell:
+      "지원자의 마지막 말을 들었다. 지원자가 면접관에게 질문을 했다면 주 질문자가 먼저 1~2문장으로 짧게 답하고, 이어서 감사 인사와 함께 면접 종료를 알린다(\"수고하셨습니다\" 포함). 답에는 위에 적힌 회사·직무·단계·형식·분위기·평가 포인트에 있는 내용만 쓴다. 거기에 없는 것(연봉, 복지, 팀 규모, 구체 일정 등)은 지어내지 말고 채용 담당자가 따로 안내드린다고 말한다. 질문이 없었다면 짧게 감사 인사와 종료만 알린다. kind=closing, end=true, backchannel=false.",
   };
+  const depth = followupsSinceLastQuestion(transcript);
+  const shake = req.phase === "next" && opts.recited && depth < profile.followupDepth;
   return [
     `## 단계\n${phaseGuide[req.phase]}`,
-    `## 남은 시간: 약 ${Math.round(left / 60)}분 · 직전 계획 질문 이후 꼬리질문 ${followupsSinceLastQuestion(transcript)}회`,
+    shake
+      ? "## 직전 답변 관찰\n직전 답변은 자소서 문장을 거의 그대로 다시 말한 것이다. 내용이 충분해 보여도 이번에는 계획 질문으로 넘어가지 말고, 준비한 글 밖의 것을 하나만 구체적으로 묻는다(당시 상황, 본인이 내린 판단, 잘 안 된 점 중 하나. kind=followup, planId=null). 외운 답변이라거나 자소서와 같다는 말은 하지 않고, 답변이 궁금해서 더 묻는 평범한 면접관처럼 말한다."
+      : "",
+    `## 남은 시간: 약 ${Math.round(left / 60)}분 · 직전 계획 질문 이후 꼬리질문 ${depth}회`,
     req.phase === "next" ? `## 이번 발화자\n- ${speaker.id}: ${speaker.name} (${speaker.role}) · 관심: ${speaker.focus.join(", ")}` : "",
     `## 다음 계획 질문\n${next ? `- ${next.id} (${next.interviewerId}, ${next.source}): ${next.question}` : "- 없음"}`,
     coverLetterClaims.length ? `## 자소서 주장\n${coverLetterClaims.map((c) => `- ${c}`).join("\n")}` : "",
+    opts.terms?.length ? `지원자 서류의 전문용어: ${opts.terms.join(", ")}` : "",
     `## 최근 대화\n${recent.join("\n") || "(아직 없음)"}`,
     `JSON 형식: {"speakerId": "이번 발화자 id", "say": "...", "kind": "question|followup|interrupt|closing|reaction", "planId": "q_... 또는 null", "waitMotion": "nod|flipPages|takeNotes|glance|still", "backchannel": true, "end": false}`,
   ]
@@ -191,9 +204,15 @@ export function fallbackAction(
     return { speakerId: last?.speaker ?? lead.id, say: "잠시만요. 시간 관계상 핵심만 한 문장으로 다시 말씀해 주시겠어요?", kind: "interrupt", planId: null, waitMotion: "still", backchannel: false, end: false };
   }
   if (req.phase === "closing")
-    return { speakerId: lead.id, say: "네, 시간이 거의 다 됐네요. 마지막으로 하고 싶은 말씀이 있으시면 해 주세요.", kind: "closing", planId: null, waitMotion: "flipPages", backchannel: true, end: false };
-  if (req.phase === "farewell")
-    return { speakerId: lead.id, say: "네, 오늘 면접은 여기까지입니다. 수고하셨습니다.", kind: "closing", planId: null, waitMotion: "nod", backchannel: false, end: true };
+    return { speakerId: lead.id, say: "네, 시간이 거의 다 됐네요. 마지막으로 하고 싶은 말씀이나 궁금한 점이 있으시면 편하게 말씀해 주세요.", kind: "closing", planId: null, waitMotion: "flipPages", backchannel: true, end: false };
+  if (req.phase === "farewell") {
+    // 키가 없으면 질문에 답할 수 없으니, 질문이 있었다는 것만 받아 준다
+    const asked = transcript.at(-1)?.speaker === "candidate" && asksQuestion(transcript.at(-1)?.text ?? "");
+    const say = asked
+      ? "네, 질문 주신 내용은 채용 담당자를 통해 안내드리겠습니다. 오늘 면접은 여기까지입니다. 수고하셨습니다."
+      : "네, 오늘 면접은 여기까지입니다. 수고하셨습니다.";
+    return { speakerId: lead.id, say, kind: "closing", planId: null, waitMotion: "nod", backchannel: false, end: true };
+  }
 
   const lastAnswer = [...transcript].reverse().find((t) => t.speaker === "candidate");
   const depth = followupsSinceLastQuestion(transcript);
@@ -204,6 +223,6 @@ export function fallbackAction(
   }
   const next = nextPlanned(profile, plan, transcript);
   if (!next)
-    return { speakerId: lead.id, say: "네, 마지막으로 하고 싶은 말씀이 있으시면 해 주세요.", kind: "closing", planId: null, waitMotion: "flipPages", backchannel: true, end: false };
+    return { speakerId: lead.id, say: "네, 마지막으로 하고 싶은 말씀이나 궁금한 점이 있으시면 말씀해 주세요.", kind: "closing", planId: null, waitMotion: "flipPages", backchannel: true, end: false };
   return { speakerId: next.interviewerId, say: next.question, kind: "question", planId: next.id, waitMotion: depth > 0 ? "flipPages" : motion, backchannel: !strict, end: false };
 }

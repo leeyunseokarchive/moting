@@ -1,5 +1,6 @@
 import "server-only";
 import { promises as fs } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { providers } from "./env";
 
@@ -46,7 +47,9 @@ export type ApiQuotaStatus = {
   };
 };
 
-const DATA_DIR = path.join(process.cwd(), ".data");
+const DATA_DIR =
+  process.env.MOTING_DATA_DIR ??
+  (process.env.VERCEL ? path.join(os.tmpdir(), ".data") : path.join(process.cwd(), ".data"));
 const USAGE_FILE = path.join(DATA_DIR, "usage.json");
 
 const DEFAULT_USAGE: UsageLedger = {

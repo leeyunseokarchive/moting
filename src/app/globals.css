@@ -330,7 +330,7 @@ p {
 }
 .tile[data-focus="on"] {
   z-index: 20;
-  transform: scale(1.035);
+  transform: scale(1.045);
 }
 .tile[data-focus="on"]::before {
   opacity: 1;
@@ -342,13 +342,107 @@ p {
   transform: scale(0.965);
   opacity: 0.9;
 }
+/* 말하지 않는 면접관은 초점 밖으로 물러난다. 상태 문구는 읽혀야 하므로 얼굴 영상만 흐린다 */
+.tile-media {
+  transition:
+    opacity 300ms var(--ease-out),
+    filter var(--dur-stage) var(--ease-spring),
+    transform var(--dur-stage) var(--ease-spring);
+}
+.tile[data-focus="off"] .tile-media {
+  filter: blur(2px) saturate(0.85);
+  /* 흐림이 가장자리에서 배경을 끌어오지 않게 살짝 키운다 */
+  transform: scale(1.04);
+}
 
-/* ───────── 면접 자막: 가사처럼 최근 줄만 또렷하다 ───────── */
+/* 말소리 표시: 말하는 동안 막대가 움직인다 */
+.voice-bars {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2px;
+  height: 12px;
+}
+.voice-bars i {
+  width: 2.5px;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--ink-3);
+  transform: scaleY(0.3);
+  transition: background-color var(--dur-base) var(--ease-out);
+}
+.voice-bars[data-on="true"] i {
+  background: var(--accent);
+  animation: voice-bar 820ms ease-in-out infinite alternate;
+}
+.voice-bars[data-on="true"] i:nth-child(2) {
+  animation-duration: 640ms;
+  animation-delay: -260ms;
+}
+.voice-bars[data-on="true"] i:nth-child(3) {
+  animation-delay: -520ms;
+}
+@keyframes voice-bar {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* 답변 종료 예고: 제어 바 위쪽 선이 남은 시간만큼 줄어든다 */
+.turn-ending {
+  position: absolute;
+  inset: -2px 0 auto;
+  height: 2px;
+  background: var(--warn);
+  transform-origin: left;
+  animation: turn-ending linear both;
+}
+@keyframes turn-ending {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* ───────── 면접 자막: 질문한 면접관 자리 아래에 놓이고, 가사처럼 최근 줄만 또렷하다 ───────── */
+.caption {
+  margin-inline: auto;
+  text-align: center;
+}
+.caption-speaker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 20px;
+  margin-bottom: 6px;
+}
+/* 좁은 화면은 면접관이 세로로 쌓이므로 가운데에 두고 이름으로 구분한다 */
+@media (min-width: 640px) {
+  .caption[data-align="start"] {
+    margin-inline: 0 auto;
+    text-align: left;
+  }
+  .caption[data-align="end"] {
+    margin-inline: auto 0;
+    text-align: right;
+  }
+  .caption[data-align="start"] .caption-speaker {
+    justify-content: flex-start;
+  }
+  .caption[data-align="end"] .caption-speaker {
+    justify-content: flex-end;
+  }
+  .caption[data-align="start"] .caption-line {
+    margin-inline: 0 auto;
+  }
+  .caption[data-align="end"] .caption-line {
+    margin-inline: auto 0;
+  }
+}
 .caption-stream {
   --caption-fade: 1;
   height: 148px;
   overflow: hidden;
-  text-align: center;
   mask-image: linear-gradient(to bottom, rgb(0 0 0 / var(--caption-fade)), #000 62%);
   transition: --caption-fade var(--dur-slow) var(--ease-out);
 }

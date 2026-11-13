@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { env, providers } from "@/lib/env";
 import { generateJSON } from "@/lib/gemini";
+import { glossary } from "@/lib/glossary";
 import { jsonError, loadSession } from "@/lib/http";
 import {
   directorSystem,
@@ -11,6 +12,7 @@ import {
 } from "@/lib/pipeline/director";
 import { store } from "@/lib/store";
 import { DirectorActionSchema, TranscriptEntrySchema } from "@/lib/types";
+import { RECITAL_THRESHOLD, recitalRatio } from "@/lib/util";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -48,6 +50,13 @@ export async function POST(req: Request, { params }: Ctx) {
               s.plan,
               transcript,
               s.parsed.coverLetterClaims.map((c) => c.claim),
+              {
+                terms: glossary(s.parsed),
+                // 직전 답변이 자소서 원문을 거의 그대로 되풀이했는지
+                recited:
+                  recitalRatio(transcript.findLast((t) => t.speaker === "candidate")?.text ?? "", s.inputsText.coverLetter ?? "") >=
+                  RECITAL_THRESHOLD,
+              },
             ),
           },
         ],

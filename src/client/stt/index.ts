@@ -8,7 +8,8 @@ import { WebSpeechStt } from "./webspeech";
 export type FinalSegment = { text: string; words: WordTiming[]; start: number; end: number };
 
 export type SttHandlers = {
-  onInterim?: (text: string) => void;
+  /** startSec: 이 중간 결과의 첫 단어 시각(녹음 기준, 초). 시각을 모르는 STT는 넘기지 않는다 */
+  onInterim?: (text: string, startSec?: number) => void;
   onFinal?: (seg: FinalSegment) => void;
   onSpeechStart?: () => void;
   onUtteranceEnd?: () => void;
@@ -22,12 +23,12 @@ export interface Stt {
 }
 
 /** Deepgram 임시 토큰을 받으면 Deepgram, 아니면 브라우저 음성 인식 */
-export async function createStt(mic: MicCapture, handlers: SttHandlers): Promise<Stt> {
+export async function createStt(mic: MicCapture, handlers: SttHandlers, keyterms: string[] = []): Promise<Stt> {
   try {
     const res = await fetch("/api/tokens/deepgram", { method: "POST" });
     if (res.status === 200) {
       const { token } = (await res.json()) as { token: string };
-      return new DeepgramStt(token, mic, handlers);
+      return new DeepgramStt(token, mic, handlers, keyterms);
     }
   } catch {
     /* 대체로 진행 */

@@ -294,7 +294,7 @@ function ReportInner() {
           )}
         </section>
 
-        {/* 면접 타임라인 (질문·답변·끼어들기·침묵 구간) */}
+        {/* 면접 타임라인 (질문·답변·끼어들기) */}
         {answers.length > 0 && (
           <Card className="space-y-4">
             <div className="flex items-baseline justify-between">
@@ -306,7 +306,6 @@ function ReportInner() {
               {answers.map((a, idx) => {
                 const left = Math.min(96, Math.max(0, (a.startSec / totalSec) * 100));
                 const width = Math.max(4, ((a.endSec - a.startSec) / totalSec) * 100);
-                const hasPause = (a.voice?.longPauses ?? 0) > 0;
                 return (
                   <button
                     key={a.id}
@@ -314,11 +313,7 @@ function ReportInner() {
                     onClick={() => toggleAnswerPlay(a)}
                     style={{ left: `${left}%`, width: `${width}%` }}
                     className={`absolute top-1.5 bottom-1.5 cursor-pointer rounded px-1.5 text-left text-[11px] font-medium text-white transition-opacity hover:opacity-90 ${
-                      a.interrupted
-                        ? "bg-pen"
-                        : hasPause
-                          ? "bg-warn"
-                          : "bg-accent"
+                      a.interrupted ? "bg-pen" : "bg-accent"
                     }`}
                     title={`질문 ${idx + 1}: ${formatSec(a.startSec)} ~ ${formatSec(a.endSec)}`}
                   >
@@ -331,9 +326,6 @@ function ReportInner() {
             <div className="flex flex-wrap gap-4 text-[12px] text-ink-2">
               <span className="inline-flex items-center gap-1.5">
                 <span className="size-2.5 rounded-xs bg-accent" /> 일반 답변 구간
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className="size-2.5 rounded-xs bg-warn" /> 2초 이상 침묵·머뭇거림 포함
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <span className="size-2.5 rounded-xs bg-pen" /> 시간 초과·말 끊김 발생
@@ -476,14 +468,14 @@ function ReportInner() {
                           음량 변화 ±{a.voice.dbStdev}dB
                         </span>
                         <span className="rounded-full bg-canvas px-3 py-1 tabular">
-                          출발 지연 {a.voice.latencySec}초
+                          첫마디까지 {a.voice.latencySec}초
                         </span>
                         <span className="rounded-full bg-canvas px-3 py-1 tabular">
                           습관어(음·어·그) {a.voice.fillerCount}회
                         </span>
                         {a.voice.longPauses > 0 && (
-                          <span className="rounded-full bg-warn-soft px-3 py-1 tabular text-warn">
-                            2초 이상 침묵 {a.voice.longPauses}회
+                          <span className="rounded-full bg-canvas px-3 py-1 tabular">
+                            생각하며 멈춤 {a.voice.longPauses}회
                           </span>
                         )}
                       </>

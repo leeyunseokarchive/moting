@@ -19,10 +19,11 @@ import {
 import { TopBar, DemoBadge } from "@/components/ui/top-bar";
 import { ApiStatusButton } from "@/components/ui/api-status";
 import { Button, Spinner } from "@/components/ui/button";
-import { Captions } from "@/components/ui/captions";
+import { Captions, type CaptionAlign } from "@/components/ui/captions";
 import { Card, Field, Notice, PageHeader } from "@/components/ui/controls";
 import { getSession, type PublicSession } from "@/client/api";
 import { resolvePortrait } from "@/lib/interviewers";
+import { glossary } from "@/lib/glossary";
 import { MicCapture } from "@/client/audio/mic";
 import { InterviewerVoice } from "@/client/audio/voice";
 import { chime } from "@/client/audio/sfx";
@@ -64,11 +65,15 @@ const MOTION_CAPTION: Record<WaitMotion, string | null> = {
   glance: "옆 면접관과 시선을 교환 중",
 };
 
-function statusText(phase: EnginePhase, answering: boolean): string {
+// 답변이 곧 끝난다고 알리기 시작하는 시점(끝나기 전 남은 시간)
+const ENDING_WARN_MS = 2500;
+
+function statusText(phase: EnginePhase, answering: boolean, ending: boolean): string {
   switch (phase) {
     case "speaking":
       return "면접관이 말하고 있습니다";
     case "listening":
+      if (ending) return "말씀이 없으면 곧 답변을 마칩니다. 이어서 말하면 계속 듣습니다";
       return answering ? "답변을 듣고 있습니다" : "답변을 시작해 주세요";
     case "thinking":
       return "면접관이 답변을 정리하고 있습니다";
@@ -110,6 +115,27 @@ function InterviewInner() {
     }
   }, []);
   const [micMuted, setMicMuted] = useState<boolean>(false);
+
+  // 자막에 보이는 질문을 한 면접관. 말을 끊고 답하면 speakerId가 먼저 비므로 직전 화자를 기억해 둔다
+  const question = view?.lastQuestion ?? "";
+  const [asker, setAsker] = useState<{ question: string; id: string | null; recent: string | null }>({
+    question: "",
+    id: null,
+    recent: null,
+  });
+  const recentSpeaker = view?.speakerId ?? asker.recent;
+  if (recentSpeaker !== asker.recent || question !== asker.question) {
+    setAsker({ question, recent: recentSpeaker, id: question !== asker.question ? recentSpeaker : asker.id });
+  }
+
+  // 침묵으로 답변이 끝나기 직전에만 알린다. 말을 이으면 endAt이 바뀌어 저절로 꺼진다
+  const endAt = view?.endAt ?? null;
+  const [endingFor, setEndingFor] = useState<number | null>(null);
+  useEffect(() => {
+    if (endAt === null) return;
+    const timer = setTimeout(() => setEndingFor(endAt), Math.max(0, endAt - performance.now() - ENDING_WARN_MS));
+    return () => clearTimeout(timer);
+  }, [endAt]);
   const [showCaptions, setShowCaptions] = useState<boolean>(true);
   const [confirmExit, setConfirmExit] = useState<boolean>(false);
   const [liveAvatars, setLiveAvatars] = useState<Record<string, boolean>>({});
@@ -235,12 +261,12 @@ function InterviewInner() {
       }
 
       const stt = await createStt(mic, {
-        onInterim: (t) => engineRef.current?.onInterim(t),
+        onInterim: (t, startSec) => engineRef.current?.onInterim(t, startSec),
         onFinal: (seg) => engineRef.current?.onFinal(seg),
         onSpeechStart: () => engineRef.current?.onSpeechStart(),
         onUtteranceEnd: () => engineRef.current?.onUtteranceEnd(),
         onError: (msg) => setError(msg),
-      });
+      }, glossary(session.parsed));
 
       if (cancelled) return;
 
@@ -431,11 +457,19 @@ function InterviewInner() {
   const activeSpeaker = phase === "speaking" ? view?.speakerId : null;
   const answering = phase === "listening" && (Boolean(view?.answering) || Boolean(view?.interim));
   const typingOpen = typing && phase === "listening";
+  const ending = answering && endAt !== null && endingFor === endAt;
   // 상태 바, 제어 바, 자막을 뺀 높이 안에서 창을 키운다
-  const tile = "clamp(300px, calc(100dvh - 330px), 560px)";
+  const tile = "clamp(300px, calc(100dvh - 356px), 560px)";
+  const stageWidth = `calc(${tile} * ${panel.length} + ${(panel.length - 1) * 20}px)`;
+  // 자막은 질문한 면접관 자리 아래에 놓는다
+  const askerIndex = panel.findIndex((iv) => iv.id === asker.id);
+  const askerInfo = askerIndex >= 0 ? panel[askerIndex] : null;
+  const captionAlign: CaptionAlign =
+    panel.length < 2 || askerIndex < 0 ? "center" : askerIndex === 0 ? "start" : askerIndex === panel.length - 1 ? "end" : "center";
 
   return (
-    <div className="flex min-h-dvh flex-col bg-canvas">
+    // 앞으로 나온 창의 그림자가 화면 밖으로 넘쳐 가로 스크롤이 생기지 않게 자른다
+    <div className="flex min-h-dvh flex-col overflow-x-clip bg-canvas">
       {/* 상단 상태 바 */}
       <header className="relative z-30 flex h-14 items-center justify-between gap-3 border-b border-black/[0.06] bg-white/80 px-4 backdrop-blur-xl sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
@@ -475,7 +509,7 @@ function InterviewInner() {
           className={`mx-auto grid w-full grid-cols-1 gap-5 ${
             panel.length === 2 ? "sm:grid-cols-2" : panel.length === 3 ? "sm:grid-cols-3" : ""
           }`}
-          style={{ maxWidth: `calc(${tile} * ${panel.length} + ${(panel.length - 1) * 20}px)` }}
+          style={{ maxWidth: stageWidth }}
         >
           {panel.map((iv) => {
             const isSpeaking = activeSpeaker === iv.id;
@@ -497,9 +531,7 @@ function InterviewInner() {
                     <img
                       src={resolvePortrait(iv)}
                       alt={iv.name}
-                      className={`size-full object-cover object-center transition-opacity duration-300 ${
-                        avatarLive ? "opacity-0" : "opacity-100"
-                      }`}
+                      className={`tile-media size-full object-cover object-center ${avatarLive ? "opacity-0" : "opacity-100"}`}
                     />
                     <video
                       ref={(el) => {
@@ -507,7 +539,7 @@ function InterviewInner() {
                       }}
                       autoPlay
                       playsInline
-                      className={`absolute inset-0 size-full object-cover object-center transition-opacity duration-300 ${
+                      className={`tile-media absolute inset-0 size-full object-cover object-center ${
                         avatarLive ? "opacity-100" : "opacity-0 pointer-events-none"
                       }`}
                     />
@@ -546,11 +578,20 @@ function InterviewInner() {
 
         {/* 자막 */}
         {showCaptions && (
-          <Captions
-            question={view?.lastQuestion ?? ""}
-            answer={[view?.answer, view?.interim].filter(Boolean).join(" ")}
-            speaking={phase === "speaking"}
-          />
+          // 오른쪽 면접관 아래 자막은 내 카메라 화면에 가리지 않게 그만큼 안쪽에 둔다
+          <div
+            className={`mx-auto flex w-full ${captionAlign === "end" && cameraOn ? "sm:pr-40" : ""}`}
+            style={{ maxWidth: stageWidth }}
+          >
+            <Captions
+              question={question}
+              answer={[view?.answer, view?.interim].filter(Boolean).join(" ")}
+              speaking={phase === "speaking" && view?.speakerId === asker.id}
+              speakerName={askerInfo?.name}
+              speakerRole={askerInfo?.role}
+              align={captionAlign}
+            />
+          </div>
         )}
 
         {/* 우측 하단 내 카메라 작은 화면 (#self-video: FaceTracker가 참조) */}
@@ -571,7 +612,9 @@ function InterviewInner() {
       </main>
 
       {/* 하단 제어 바 */}
-      <footer className="border-t border-black/[0.06] bg-white/85 px-4 py-3 backdrop-blur-xl sm:px-6">
+      <footer className="relative border-t border-black/[0.06] bg-white/85 px-4 py-3 backdrop-blur-xl sm:px-6">
+        {/* 침묵이 이어져 답변이 곧 끝날 때 남은 시간을 선으로 보여 준다 */}
+        {ending && <span key={endAt} className="turn-ending" style={{ animationDuration: `${ENDING_WARN_MS}ms` }} aria-hidden />}
         <div className="mx-auto flex max-w-[1632px] items-center justify-between gap-3">
           {typingOpen ? (
             <div className="fade flex min-w-0 flex-1 items-center gap-2">
@@ -601,10 +644,10 @@ function InterviewInner() {
             <div aria-live="polite" className="flex min-w-0 flex-1 items-center gap-2.5 text-[14px] text-ink-2">
               <span
                 className={`size-2.5 shrink-0 rounded-full transition-colors ${
-                  phase === "listening" ? "animate-pulse bg-positive" : phase === "speaking" ? "bg-accent" : "bg-ink-3"
+                  ending ? "bg-warn" : phase === "listening" ? "animate-pulse bg-positive" : phase === "speaking" ? "bg-accent" : "bg-ink-3"
                 }`}
               />
-              <span className="truncate">{statusText(phase, answering)}</span>
+              <span className="truncate">{statusText(phase, answering, ending)}</span>
             </div>
           )}
 

@@ -24,6 +24,8 @@ export const ParsedInputSchema = z.object({
   requirements: z.array(z.string()).default([]),
   candidateName: z.string().default(""),
   candidateHighlights: z.array(z.string()).default([]),
+  /** 면접에서 말로 나올 전문용어·고유명사. 음성 인식 보정과 답변 해석에 쓴다 */
+  terms: z.array(z.string()).default([]),
   coverLetterClaims: z
     .array(z.object({ claim: z.string(), detail: z.string().default("") }))
     .default([]),

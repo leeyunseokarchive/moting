@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fallbackAction, nextPlanned, normalizeAction } from "../src/lib/pipeline/director";
+import { directorSystem, directorUserPrompt, fallbackAction, nextPlanned, normalizeAction } from "../src/lib/pipeline/director";
 import { nextSpeaker } from "../src/lib/interviewers";
 import { EnvironmentProfileSchema, type QuestionPlanItem, type TranscriptEntry } from "../src/lib/types";
 
@@ -188,5 +188,93 @@ describe("fallbackAction", () => {
     expect(concrete.kind).toBe("question");
     expect(concrete.planId).toBe("q_b");
     expect(concrete.speakerId).toBe("iv2");
+  });
+});
+
+describe("마무리와 끝인사", () => {
+  const asked = (text: string): TranscriptEntry[] => [
+    { speaker: "iv1", text: "마지막으로 하고 싶은 말씀이나 궁금한 점이 있으시면 말씀해 주세요.", at: 0, kind: "closing" },
+    { speaker: "candidate", text, at: 1, kind: "answer" },
+  ];
+
+  it("마무리 질문은 궁금한 점도 묻는다", () => {
+    const a = fallbackAction({ phase: "closing", elapsedSec: 1100 }, profile, plan, []);
+    expect(a.kind).toBe("closing");
+    expect(a.say).toContain("궁금한 점");
+    expect(a.end).toBe(false);
+  });
+
+  it("질문을 다 쓰고 발화가 비면 궁금한 점까지 묻는 마무리로 채운다", () => {
+    const used: TranscriptEntry[] = plan.map((p, i) => ({ speaker: p.interviewerId, text: p.question, at: i, kind: "question", planId: p.id }));
+    const a = normalizeAction({ speakerId: "iv1", say: "", kind: "question" }, profile, plan, used);
+    expect(a.kind).toBe("closing");
+    expect(a.say).toContain("궁금한 점");
+  });
+
+  it("궁금한 점을 묻는 계획 질문도 마무리로 본다", () => {
+    const outro: QuestionPlanItem[] = [{ id: "q_out", interviewerId: "iv1", question: "궁금한 점이 있으시면 편하게 말씀해 주세요.", intent: "", source: "general" }];
+    expect(normalizeAction({ speakerId: "iv1", say: "궁금한 점 있으신가요?", kind: "question", planId: "q_out" }, profile, outro, []).kind).toBe("closing");
+  });
+
+  it("지원자가 질문했으면 끝인사에서 받아 주고 끝낸다", () => {
+    for (const q of ["입사하면 어떤 팀에서 일하게 되나요?", "팀 규모가 궁금합니다", "신입 교육은 어떻게 진행됩니까"]) {
+      const a = fallbackAction({ phase: "farewell", elapsedSec: 1200 }, profile, plan, asked(q));
+      expect(a.say).toContain("채용 담당자");
+      expect(a.say).toContain("수고하셨습니다");
+      expect(a.end).toBe(true);
+      expect(a.speakerId).toBe("iv1");
+    }
+  });
+
+  it("질문이 없었으면 짧게 끝인사만 한다", () => {
+    const a = fallbackAction({ phase: "farewell", elapsedSec: 1200 }, profile, plan, asked("꼭 함께 일하고 싶습니다. 감사합니다."));
+    expect(a.say).toBe("네, 오늘 면접은 여기까지입니다. 수고하셨습니다.");
+    expect(a.end).toBe(true);
+    const none = fallbackAction({ phase: "farewell", elapsedSec: 1200 }, profile, plan, asked("아니요, 궁금한 점은 없습니다. 감사합니다."));
+    expect(none.say).not.toContain("채용 담당자");
+    // 지원자가 아무 말도 하지 않아 마지막 기록이 면접관 질문인 경우
+    expect(fallbackAction({ phase: "farewell", elapsedSec: 1200 }, profile, plan, asked("x").slice(0, 1)).say).not.toContain("채용 담당자");
+  });
+});
+
+describe("directorUserPrompt", () => {
+  const t: TranscriptEntry[] = [
+    { speaker: "iv1", text: "프로젝트 역할을 설명해 주세요.", at: 0, kind: "question", planId: "q_a" },
+    { speaker: "candidate", text: "백엔드 9조를 맡았습니다.", at: 1, kind: "answer" },
+  ];
+  const next = { phase: "next" as const, elapsedSec: 60 };
+
+  it("전문용어가 있을 때만 한 줄로 넣는다", () => {
+    expect(directorUserPrompt(next, profile, plan, t, [], { terms: ["Redis", "구조"] })).toContain("지원자 서류의 전문용어: Redis, 구조");
+    expect(directorUserPrompt(next, profile, plan, t, [], { terms: [] })).not.toContain("전문용어");
+    expect(directorUserPrompt(next, profile, plan, t, [])).not.toContain("전문용어");
+  });
+
+  it("진행자에게 받아쓰기 오류를 되묻지 말라고 알린다", () => {
+    expect(directorSystem(profile)).toContain("음성 인식");
+  });
+
+  it("자소서를 그대로 말했으면 준비한 글 밖을 묻게 한다", () => {
+    expect(directorUserPrompt(next, profile, plan, t, [], { recited: true })).toContain("준비한 글 밖");
+    expect(directorUserPrompt(next, profile, plan, t, [], { recited: false })).not.toContain("준비한 글 밖");
+  });
+
+  it("꼬리질문을 다 썼거나 다른 단계면 넣지 않는다", () => {
+    const spent: TranscriptEntry[] = [
+      ...t,
+      { speaker: "iv2", text: "더 구체적으로요?", at: 2, kind: "followup" },
+      { speaker: "candidate", text: "네.", at: 3, kind: "answer" },
+      { speaker: "iv1", text: "수치는요?", at: 4, kind: "followup" },
+      { speaker: "candidate", text: "네.", at: 5, kind: "answer" },
+    ];
+    expect(directorUserPrompt(next, profile, plan, spent, [], { recited: true })).not.toContain("준비한 글 밖");
+    expect(directorUserPrompt({ phase: "farewell", elapsedSec: 1200 }, profile, plan, t, [], { recited: true })).not.toContain("준비한 글 밖");
+  });
+
+  it("끝인사 단계는 지원자 질문에 답하되 없는 사실은 채용 담당자에게 넘기게 한다", () => {
+    const p = directorUserPrompt({ phase: "farewell", elapsedSec: 1200 }, profile, plan, t, []);
+    expect(p).toContain("채용 담당자");
+    expect(p).toContain("수고하셨습니다");
+    expect(directorUserPrompt({ phase: "closing", elapsedSec: 1100 }, profile, plan, t, [])).toContain("궁금한 점");
   });
 });

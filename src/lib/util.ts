@@ -45,3 +45,24 @@ export function formatClock(sec: number): string {
   const m = Math.floor(s / 60);
   return `${String(m).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 }
+
+/** 자소서를 거의 그대로 외워 말했다고 보는 기준(recitalRatio 값) */
+export const RECITAL_THRESHOLD = 0.4;
+
+/**
+ * 답변이 원문(자소서)을 얼마나 그대로 되풀이했는지 0~1.
+ * 공백·문장부호를 뺀 글자 n-gram 중 원문에도 있는 비율. 답변은 음성 인식 결과라 긴 일치는 드물어 n을 짧게 잡는다.
+ */
+export function recitalRatio(answer: string, source: string, n = 4): number {
+  const norm = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+  const a = norm(answer);
+  const src = norm(source);
+  // 짧은 답변은 어미만 겹쳐도 비율이 튀므로 판단하지 않는다
+  if (a.length < 40 || src.length < n) return 0;
+  const grams = new Set<string>();
+  for (let i = 0; i + n <= src.length; i++) grams.add(src.slice(i, i + n));
+  let hit = 0;
+  const total = a.length - n + 1;
+  for (let i = 0; i < total; i++) if (grams.has(a.slice(i, i + n))) hit++;
+  return hit / total;
+}
