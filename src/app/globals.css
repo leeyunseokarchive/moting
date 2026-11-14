@@ -495,25 +495,6 @@ p {
   }
 }
 
-/* ───────── 첫 화면: 면접관이 번갈아 앞으로 나온다 ───────── */
-@keyframes hero-focus {
-  0%,
-  26% {
-    transform: scale(1.04);
-  }
-  34%,
-  92% {
-    transform: scale(0.97);
-    opacity: 0.92;
-  }
-  100% {
-    transform: scale(1.04);
-  }
-}
-.hero-tile {
-  animation: hero-focus 12s var(--ease-spring) infinite;
-}
-
 /* ───────── 페이지 전환 ───────── */
 @keyframes page-out {
   to {

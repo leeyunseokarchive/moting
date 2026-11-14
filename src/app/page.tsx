@@ -1,13 +1,7 @@
 import { ButtonLink } from "@/components/ui/button";
 import { SiteFooter } from "@/components/ui/site-footer";
 import { TopBar } from "@/components/ui/top-bar";
-import { PERSONAS } from "@/lib/interviewers";
-
-const PANEL = [
-  { p: PERSONAS[1], name: "김서연", role: "인사팀 과장" },
-  { p: PERSONAS[0], name: "박도현", role: "개발팀 팀장" },
-  { p: PERSONAS[2], name: "이정민", role: "기술본부 상무" },
-];
+import { HeroStage } from "@/components/landing/hero-stage";
 
 const STEPS = [
   {
@@ -47,26 +41,7 @@ export default function Home() {
         </section>
 
         <section aria-label="면접장 미리보기" className="mx-auto max-w-5xl px-4 sm:px-6">
-          <div className="relative overflow-hidden rounded-[28px] bg-canvas px-4 pb-0 pt-10 sm:px-10 sm:pt-14">
-            <div className="mx-auto grid max-w-3xl grid-cols-3 gap-3 sm:gap-6">
-              {PANEL.map(({ p, name, role }, i) => (
-                <figure key={p.key} className="flex flex-col items-center">
-                  <div
-                    className="hero-tile aspect-[4/5] w-full overflow-hidden rounded-[18px] bg-white shadow-[var(--shadow-card)]"
-                    style={{ animationDelay: `${i * 4}s` }}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={p.portrait} alt="" width={600} height={750} className="size-full object-cover" />
-                  </div>
-                  <figcaption className="relative z-10 -mt-3 rounded-[8px] bg-white px-3 py-1.5 text-center shadow-[0_1px_2px_rgb(0_0_0/8%)] sm:px-4">
-                    <span className="block text-[12px] font-semibold sm:text-[14px]">{name}</span>
-                    <span className="block text-[11px] text-ink-3 sm:text-[12px]">{role}</span>
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-            <div aria-hidden className="mx-auto mt-6 h-16 max-w-4xl rounded-t-[20px] bg-white/70 shadow-[inset_0_1px_0_rgb(0_0_0/6%)] sm:h-24" />
-          </div>
+          <HeroStage />
         </section>
 
         <section className="mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-28">
