@@ -62,8 +62,20 @@ export function resolvePortrait(iv: { faceId?: string; portrait?: string }): str
   return PERSONAS[0].portrait;
 }
 
-/** 역할 순서대로 기본 외형을 배정한다: 실무 리드 → 인사 → 임원 */
+/** 역할 순서대로 기본 외형을 배정한다: 실무 리드 → 인사 → 임원. 교수님 피드백으로 동양인 얼굴 3명으로 고정 */
 export const DEFAULT_PANEL = ["daniel", "mei", "tina"] as const;
+
+/** 자리별 외형 키. 기본 패널(동양인 얼굴 3명) 안에서만 성별을 맞추고, 남는 자리를 hank로 채우지 않는다 */
+export function panelKeys(genders: Persona["gender"][]): string[] {
+  const used = new Set<string>();
+  return genders.map((g, i) => {
+    let key: string = DEFAULT_PANEL[i] ?? "hank";
+    if (persona(key).gender !== g) key = DEFAULT_PANEL.find((k) => persona(k).gender === g && !used.has(k)) ?? key;
+    if (used.has(key)) key = DEFAULT_PANEL.find((k) => !used.has(k)) ?? PERSONAS.find((x) => !used.has(x.key))?.key ?? key;
+    used.add(key);
+    return key;
+  });
+}
 
 /** 다음에 말할 면접관. 발언 수를 주 질문자 4 : 나머지 각 3으로 맞추고, 같으면 주 질문자가 먼저 말한다. */
 export function nextSpeaker(panel: Interviewer[], transcript: TranscriptEntry[]): Interviewer {

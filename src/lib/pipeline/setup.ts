@@ -2,7 +2,7 @@ import "server-only";
 import { z } from "zod";
 import { env, providers } from "../env";
 import { generateJSON } from "../gemini";
-import { DEFAULT_PANEL, persona, PERSONAS } from "../interviewers";
+import { panelKeys, persona } from "../interviewers";
 import { bankCandidates, companyProfile, type BankQuestion, type CompanyProfile } from "../seed/dataset";
 import {
   EnvironmentProfileSchema,
@@ -147,16 +147,9 @@ function assemble(parsed: ParsedInput, d: SetupDraft, used: Review[], company: C
   const panel = draftPanel.slice(0, wanted);
   if (!panel.some((p) => p.isLead)) panel[0].isLead = true;
 
-  const usedKeys = new Set<string>();
+  const keys = panelKeys(panel.map((p) => p.gender));
   const interviewers: Interviewer[] = panel.map((p, i) => {
-    const preferred = DEFAULT_PANEL[i] ?? "hank";
-    let key: string = preferred;
-    if (persona(preferred).gender !== p.gender) {
-      const alt = PERSONAS.find((x) => x.gender === p.gender && !usedKeys.has(x.key));
-      if (alt) key = alt.key;
-    }
-    if (usedKeys.has(key)) key = PERSONAS.find((x) => !usedKeys.has(x.key))?.key ?? key;
-    usedKeys.add(key);
+    const key = keys[i];
     const per = persona(key);
     return {
       id: `iv${i + 1}`,
